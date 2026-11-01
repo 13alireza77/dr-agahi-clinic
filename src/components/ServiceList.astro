@@ -1,0 +1,30 @@
+---
+// Services staggered diagonally, as on the printed poster.
+import { getServices, serviceUrl } from "../lib/services";
+import { fa, link } from "../lib/site";
+import Photo from "./Photo.astro";
+import Icon from "./Icon.astro";
+
+interface Props { headingLevel?: "h2" | "h3"; }
+const { headingLevel: H = "h3" } = Astro.props;
+const services = await getServices();
+---
+<div class="services">
+  {services.map((s, i) => (
+    <a class="svc reveal" href={link(serviceUrl(s.id))}>
+      <div class="svc__media">
+        <span class="svc__num" aria-hidden="true">{fa(i + 1)}</span>
+        <Photo name={s.data.photo} alt={s.data.photoAlt} label={s.data.title} sizes="(max-width: 700px) 40vw, 440px" />
+      </div>
+      <div class="svc__body">
+        <H>{s.data.title}</H>
+        <hr class="rule" />
+        <p>{s.data.short}</p>
+        {s.data.items.length > 0 && (
+          <div class="svc__tags">{s.data.items.map((it) => <span class="tag">{it.title}</span>)}</div>
+        )}
+        <span class="link-arrow">بیشتر بدانید <Icon name="arrow" /></span>
+      </div>
+    </a>
+  ))}
+</div>

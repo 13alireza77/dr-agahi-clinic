@@ -1,0 +1,35 @@
+---
+import { site, fa, faPhone, telHref, link } from "../lib/site";
+import { getServices, serviceUrl } from "../lib/services";
+
+const services = await getServices();
+const year = new Intl.DateTimeFormat("fa-IR-u-ca-persian", { year: "numeric" }).format(new Date());
+---
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <strong style="color:var(--ink);font-size:1.1rem">{site.doctor}</strong>
+        <span class="wordmark-latin">{site.wordmark}</span>
+        <p>{site.tagline} — {site.address}</p>
+      </div>
+      <nav aria-label="خدمات">
+        <h2>خدمات</h2>
+        <ul>{services.map((s) => <li><a href={link(serviceUrl(s.id))}>{s.data.title}</a></li>)}</ul>
+      </nav>
+      <div>
+        <h2>دسترسی سریع</h2>
+        <ul>
+          <li><a href={link("/about/")}>درباره‌ی دکتر آگاهی</a></li>
+          <li><a href={link("/booking/")}>رزرو نوبت و نشانی</a></li>
+          <li><a href={telHref}><bdi>{faPhone(site.phone)}</bdi></a></li>
+          <li><a href={site.irimcUrl} target="_blank" rel="noopener">استعلام نظام پزشکی</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>نظام پزشکی: {fa(site.irimc)}</span>
+      <span>© {year} — {site.name}</span>
+    </div>
+  </div>
+</footer>

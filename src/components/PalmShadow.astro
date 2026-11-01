@@ -1,0 +1,58 @@
+---
+// Procedurally drawn palm fronds, blurred in CSS to read as soft window shadows.
+interface Props { class?: string; seed?: number; }
+const { class: className = "", seed = 7 } = Astro.props;
+
+let s = seed;
+const rand = () => ((s = (s * 16807) % 2147483647) / 2147483647);
+
+type P = [number, number];
+const bez = (a: P, c: P, b: P, t: number): P => [
+  (1 - t) ** 2 * a[0] + 2 * (1 - t) * t * c[0] + t ** 2 * b[0],
+  (1 - t) ** 2 * a[1] + 2 * (1 - t) * t * c[1] + t ** 2 * b[1],
+];
+const tan = (a: P, c: P, b: P, t: number): P => [
+  2 * (1 - t) * (c[0] - a[0]) + 2 * t * (b[0] - c[0]),
+  2 * (1 - t) * (c[1] - a[1]) + 2 * t * (b[1] - c[1]),
+];
+const f = (n: number) => n.toFixed(1);
+
+function frond(base: P, angle: number, length: number, bend: number, leaflets: number) {
+  const dir: P = [Math.cos(angle), Math.sin(angle)];
+  const nrm: P = [-dir[1], dir[0]];
+  const tip: P = [base[0] + dir[0] * length, base[1] + dir[1] * length];
+  const ctrl: P = [base[0] + dir[0] * length * 0.5 + nrm[0] * bend, base[1] + dir[1] * length * 0.5 + nrm[1] * bend];
+  const out: string[] = [];
+  out.push(`M${f(base[0])} ${f(base[1])}Q${f(ctrl[0])} ${f(ctrl[1])} ${f(tip[0])} ${f(tip[1])}`);
+  for (let i = 1; i <= leaflets; i++) {
+    const t = 0.08 + (i / leaflets) * 0.9;
+    const p = bez(base, ctrl, tip, t);
+    const d = tan(base, ctrl, tip, t);
+    const dl = Math.hypot(d[0], d[1]);
+    const ux = d[0] / dl, uy = d[1] / dl;
+    for (const side of [1, -1]) {
+      const spread = (0.95 + rand() * 0.25) * side;
+      const len = length * (0.42 - t * 0.3) * (0.85 + rand() * 0.3);
+      const a = Math.atan2(uy, ux) + spread + 0.25 * side * t;
+      const droop = 0.22 * side;
+      const q: P = [p[0] + Math.cos(a + droop) * len, p[1] + Math.sin(a + droop) * len];
+      const m: P = [p[0] + Math.cos(a) * len * 0.5, p[1] + Math.sin(a) * len * 0.5];
+      const w = len * 0.085;
+      const nx = -Math.sin(a), ny = Math.cos(a);
+      out.push(
+        `M${f(p[0])} ${f(p[1])}Q${f(m[0] + nx * w)} ${f(m[1] + ny * w)} ${f(q[0])} ${f(q[1])}Q${f(m[0] - nx * w)} ${f(m[1] - ny * w)} ${f(p[0])} ${f(p[1])}Z`,
+      );
+    }
+  }
+  return out.join("");
+}
+
+const d = [
+  frond([980, -40], 2.25, 760, -120, 26),
+  frond([1000, 60], 2.75, 680, 90, 24),
+  frond([930, -80], 1.85, 620, 110, 22),
+].join("");
+---
+<svg class={`palm ${className}`} viewBox="0 0 1000 900" aria-hidden="true" focusable="false">
+  <path d={d} fill="currentColor" stroke="currentColor" stroke-width="6" stroke-linejoin="round" />
+</svg>

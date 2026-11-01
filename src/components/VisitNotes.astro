@@ -1,0 +1,16 @@
+---
+import { site } from "../lib/site";
+import Icon from "./Icon.astro";
+---
+<div class="visit reveal">
+  <Icon name="shoe" class="visit__art" />
+  <div>
+    <span class="eyebrow">پیش از مراجعه</span>
+    <h2 id="visit-title" class="h3" style="margin:10px 0 18px">چند نکته برای یک ویزیت آرام</h2>
+    <ul class="notes">
+      {site.visitNotes.map((n, i) => (
+        <li class={i === 0 ? "is-key" : ""}><Icon name={i === 0 ? "info" : "check"} />{n}</li>
+      ))}
+    </ul>
+  </div>
+</div>

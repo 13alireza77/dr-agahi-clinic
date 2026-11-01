@@ -1,0 +1,41 @@
+---
+// Drop a file named `<name>.jpg|png|webp` into src/assets/photos/ and it replaces the placeholder.
+// Images are converted to AVIF/WebP at build time and lazy-loaded unless `eager` is set.
+import { Picture } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  name: string;
+  alt: string;
+  label?: string;
+  shape?: "round" | "arch" | "circle";
+  sizes?: string;
+  eager?: boolean;
+  class?: string;
+}
+const { name, alt, label, shape = "round", sizes = "(max-width: 900px) 90vw, 560px", eager = false, class: className = "" } = Astro.props;
+
+const files = import.meta.glob<ImageMetadata>("/src/assets/photos/*.{jpg,jpeg,png,webp,avif}", { eager: true, import: "default" });
+const src = Object.entries(files).find(([path]) => path.split("/").pop()!.replace(/\.\w+$/, "") === name)?.[1];
+const showLabel = import.meta.env.DEV && label;
+---
+<div class={`frame frame--${shape} ${className}`}>
+  {src ? (
+    <Picture
+      src={src}
+      alt={alt}
+      formats={["avif", "webp"]}
+      widths={[360, 560, 800, 1120]}
+      sizes={sizes}
+      loading={eager ? "eager" : "lazy"}
+      fetchpriority={eager ? "high" : "auto"}
+    />
+  ) : (
+    <div class="placeholder" role="img" aria-label={alt}>
+      <svg class="placeholder__icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
+        <path d="M32 8c6 9 6 18 0 26-6-8-6-17 0-26Z" /><path d="M32 34c9-5 17-4 23 2-8 4-16 4-23-2ZM32 34c-9-5-17-4-23 2 8 4 16 4 23-2Z" /><path d="M32 34v22" />
+      </svg>
+      {showLabel && <span class="placeholder__label">جای عکس: {label}</span>}
+    </div>
+  )}
+</div>

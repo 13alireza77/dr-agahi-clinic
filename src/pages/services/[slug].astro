@@ -1,0 +1,175 @@
+---
+import { render } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import Photo from "../../components/Photo.astro";
+import Icon from "../../components/Icon.astro";
+import PalmShadow from "../../components/PalmShadow.astro";
+import ContactPanel from "../../components/ContactPanel.astro";
+import Slot from "../../components/Slot.astro";
+import { getServices, serviceUrl } from "../../lib/services";
+import { site, fa, faPhone, telHref, link } from "../../lib/site";
+import { breadcrumb, faqPage, webPage } from "../../lib/schema";
+
+export async function getStaticPaths() {
+  const services = await getServices();
+  return services.map((service) => ({ params: { slug: service.id }, props: { service, all: services } }));
+}
+
+const { service, all } = Astro.props;
+const d = service.data;
+const { Content } = await render(service);
+const url = serviceUrl(service.id);
+const related = all.filter((s) => s.id !== service.id);
+
+const schema = [
+  webPage(url, d.seoTitle, d.description, "MedicalWebPage"),
+  breadcrumb([
+    { name: "خانه", url: "/" },
+    { name: "خدمات", url: "/services/" },
+    { name: d.title, url },
+  ]),
+  ...(d.faq.length ? [faqPage(url, d.faq)] : []),
+];
+---
+<Base title={d.seoTitle} description={d.description} schema={schema}>
+  <section class="page-hero">
+    <PalmShadow seed={d.order * 5} />
+    <div class="container">
+      <nav class="crumbs" aria-label="مسیر صفحه">
+        <ol>
+          <li><a href={link("/")}>خانه</a></li>
+          <li><a href={link("/services/")}>خدمات</a></li>
+          <li aria-current="page">{d.title}</li>
+        </ol>
+      </nav>
+      <div class="page-hero__grid">
+        <div>
+          <span class="eyebrow reveal">{d.short}</span>
+          <h1 class="reveal" style="--d:.06s">{d.title}</h1>
+          <p class="lead reveal" style="--d:.12s">{d.lead}</p>
+          <div class="btn-row reveal" style="--d:.18s">
+            <a class="btn btn--primary" href={site.bookingUrl} target="_blank" rel="noopener"><Icon name="calendar" />رزرو نوبت مشاوره</a>
+            <a class="btn btn--ghost" href={telHref}><Icon name="phone" /><bdi>{faPhone(site.phone)}</bdi></a>
+          </div>
+        </div>
+        <div class="page-hero__media reveal" style="--d:.1s">
+          <Photo name={d.photo} alt={d.photoAlt} label={d.photoAlt} eager sizes="(max-width: 900px) 92vw, 520px" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* What it covers */}
+  <section class="section section--tight" aria-labelledby="items-title">
+    <div class="container">
+      <header class="section-head reveal">
+        <span class="eyebrow">{d.title}</span>
+        <h2 id="items-title" class="h2">{d.itemsTitle}</h2>
+      </header>
+      {d.items.length ? (
+        <ul class="items">
+          {d.items.map((it, i) => (
+            <li class="item reveal" id={it.id} style={`--d:${i * 0.07}s`}>
+              <h3>{it.title}</h3>
+              <hr class="rule" />
+              <p>{it.text}</p>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="muted reveal">
+          روش درمان پس از معاینه و بر اساس علت و شدت ریزش، برای شما انتخاب می‌شود. <Slot label="فهرست روش‌های درمان" />
+        </p>
+      )}
+    </div>
+  </section>
+
+  {/* Body + suitable for */}
+  <section class="section section--tight">
+    <div class="container split">
+      <div class="prose reveal">
+        <span class="eyebrow">رویکرد درمان</span>
+        <h2 class="h3" style="margin:10px 0 18px">چطور انجام می‌شود؟</h2>
+        <Content />
+      </div>
+      <div class="reveal" style="--d:.08s">
+        <span class="eyebrow">مناسب برای</span>
+        <h2 class="h3" style="margin-top:10px">چه کسانی مراجعه می‌کنند؟</h2>
+        <ul class="checklist">
+          {d.suitable.map((x) => <li><Icon name="check" />{x}</li>)}
+        </ul>
+        <p class="disclaimer" style="margin-top:22px">مناسب بودن هر درمان برای شما فقط پس از معاینه‌ی پزشک مشخص می‌شود.</p>
+      </div>
+    </div>
+  </section>
+
+  {/* Steps */}
+  <section class="section section--tight" aria-labelledby="steps-title">
+    <div class="container">
+      <header class="section-head reveal">
+        <span class="eyebrow">مراحل</span>
+        <h2 id="steps-title" class="h2">مسیر درمان</h2>
+      </header>
+      <ol class="steps">
+        {d.steps.map((s, i) => (
+          <li class="step reveal" style={`--d:${i * 0.08}s`}>
+            <span class="step__n">{fa(i + 1)}</span>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  {/* FAQ */}
+  {d.faq.length > 0 && (
+    <section class="section section--tight" aria-labelledby="faq-title">
+      <div class="container split">
+        <header class="reveal">
+          <span class="eyebrow">پرسش‌های رایج</span>
+          <h2 id="faq-title" class="h2" style="margin-top:12px">درباره‌ی {d.title}</h2>
+          <p class="muted" style="margin-top:14px">پاسخ دقیق‌تر را در جلسه‌ی مشاوره و بر اساس شرایط خودتان دریافت می‌کنید.</p>
+        </header>
+        <div class="faq reveal" style="--d:.08s">
+          {d.faq.map((f, i) => (
+            <details open={i === 0}>
+              <summary>{f.q}</summary>
+              <div class="faq__a"><p>{f.a}</p></div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* Related */}
+  <section class="section section--tight" aria-labelledby="related-title">
+    <div class="container">
+      <header class="section-head reveal">
+        <span class="eyebrow">خدمات دیگر</span>
+        <h2 id="related-title" class="h3" style="margin-top:10px">شاید این خدمات هم برایتان مفید باشد</h2>
+      </header>
+      <div class="related">
+        {related.map((s, i) => (
+          <a href={link(serviceUrl(s.id))} class="reveal" style={`--d:${i * 0.07}s`}>
+            <Photo name={s.data.photo} alt={s.data.photoAlt} sizes="(max-width: 700px) 110px, 360px" />
+            <div>
+              <h3>{s.data.title}</h3>
+              <p>{s.data.short}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <ContactPanel />
+      <p class="disclaimer" style="margin-top:28px">
+        محتوای این صفحه برای آشنایی عمومی است و جایگزین معاینه و مشاوره‌ی پزشکی نیست. نتیجه‌ی درمان در افراد مختلف متفاوت است.
+      </p>
+    </div>
+  </section>
+</Base>

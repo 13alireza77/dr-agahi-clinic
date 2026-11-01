@@ -1,0 +1,41 @@
+---
+import { link } from "../../lib/site";
+import Base from "../../layouts/Base.astro";
+import PalmShadow from "../../components/PalmShadow.astro";
+import ServiceList from "../../components/ServiceList.astro";
+import ContactPanel from "../../components/ContactPanel.astro";
+import { breadcrumb, webPage } from "../../lib/schema";
+
+const title = "خدمات زیبایی پوست و مو در قلهک | دکتر صدف آگاهی";
+const description =
+  "خدمات مطب دکتر صدف آگاهی در قلهک تهران: درمان ریزش مو، بوتاکس و بوتاکس زیربغل، تزریق ژل، پاک‌سازی و آبرسانی پوست، درمان جوش و برداشت خال.";
+---
+<Base
+  title={title}
+  description={description}
+  schema={[webPage("/services/", title, description, "CollectionPage"), breadcrumb([{ name: "خانه", url: "/" }, { name: "خدمات", url: "/services/" }])]}
+>
+  <section class="page-hero">
+    <PalmShadow seed={9} />
+    <div class="container" style="position:relative;z-index:1">
+      <nav class="crumbs" aria-label="مسیر صفحه">
+        <ol><li><a href={link("/")}>خانه</a></li><li aria-current="page">خدمات</li></ol>
+      </nav>
+      <header class="section-head" style="margin-top:28px;margin-bottom:0">
+        <span class="eyebrow reveal">خدمات مطب</span>
+        <h1 class="reveal" style="--d:.06s">خدمات زیبایی پوست و مو</h1>
+        <p class="lead reveal" style="--d:.12s;margin-top:16px">
+          چهار گروه خدمات، با یک رویکرد: معاینه‌ی دقیق، گفت‌وگو درباره‌ی خواسته‌ی شما و پلن درمانی که در پرونده‌تان ثبت و پیگیری می‌شود.
+        </p>
+      </header>
+    </div>
+  </section>
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <ServiceList headingLevel="h2" />
+    </div>
+  </section>
+  <section class="section" style="padding-top:0">
+    <div class="container"><ContactPanel /></div>
+  </section>
+</Base>

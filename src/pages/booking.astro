@@ -1,0 +1,76 @@
+---
+import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
+import PalmShadow from "../components/PalmShadow.astro";
+import MapCard from "../components/MapCard.astro";
+import VisitNotes from "../components/VisitNotes.astro";
+import Slot from "../components/Slot.astro";
+import { site, fa, faPhone, telHref, link } from "../lib/site";
+import { breadcrumb, webPage } from "../lib/schema";
+
+const title = "رزرو نوبت و نشانی مطب دکتر صدف آگاهی | قلهک تهران";
+const description =
+  "رزرو نوبت مطب دکتر صدف آگاهی؛ تلفنی با شماره‌ی ۰۹۱۰۲۳۸۴۶۴۹ یا آنلاین از طریق پذیرش۲۴. نشانی: روبه‌روی متروی قلهک، خیابان شهید کدویی، ساختمان پزشکان آرامش.";
+---
+<Base
+  title={title}
+  description={description}
+  schema={[webPage("/booking/", title, description, "ContactPage"), breadcrumb([{ name: "خانه", url: "/" }, { name: "رزرو و تماس", url: "/booking/" }])]}
+>
+  <section class="page-hero">
+    <PalmShadow seed={17} />
+    <div class="container" style="position:relative;z-index:1">
+      <nav class="crumbs" aria-label="مسیر صفحه">
+        <ol><li><a href={link("/")}>خانه</a></li><li aria-current="page">رزرو و تماس</li></ol>
+      </nav>
+      <header class="section-head" style="margin-top:28px">
+        <span class="eyebrow reveal">رزرو نوبت</span>
+        <h1 class="reveal" style="--d:.06s">{site.bookingText}</h1>
+        <p class="lead reveal" style="--d:.12s;margin-top:16px">روش دلخواهتان را انتخاب کنید؛ هر دو راه به یک نوبت می‌رسند.</p>
+      </header>
+
+      <div class="book-cards">
+        <a class="book-card book-card--dark reveal" href={site.bookingUrl} target="_blank" rel="noopener">
+          <span class="book-card__ic"><Icon name="calendar" /></span>
+          <h2>رزرو آنلاین در پذیرش۲۴</h2>
+          <p>زمان‌های خالی را ببینید و در چند دقیقه نوبت بگیرید.</p>
+          <span class="btn btn--light">ورود به صفحه‌ی رزرو <Icon name="external" /></span>
+        </a>
+        <a class="book-card book-card--light reveal" style="--d:.08s" href={telHref}>
+          <span class="book-card__ic"><Icon name="phone" /></span>
+          <h2>رزرو تلفنی</h2>
+          <p class="big"><bdi>{faPhone(site.phone)}</bdi></p>
+          {site.landline ? <p>تلفن ثابت: <bdi>{fa(site.landline)}</bdi></p> : <Slot label="تلفن ثابت" />}
+          <span class="btn btn--primary">تماس بگیرید <Icon name="phone" /></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight" aria-labelledby="address-title">
+    <div class="container split" style="align-items:start">
+      <div class="reveal">
+        <span class="eyebrow">نشانی مطب</span>
+        <h2 id="address-title" class="h2" style="margin:12px 0 18px">روبه‌روی متروی قلهک</h2>
+        <address class="lead" style="font-style:normal">{site.address}</address>
+
+        <h3 class="h3" style="margin:36px 0 12px">ساعات کاری</h3>
+        {site.hours.length ? (
+          <ul class="hours">
+            {site.hours.map((h: { days: string; time: string }) => <li><span>{h.days}</span><span>{fa(h.time)}</span></li>)}
+          </ul>
+        ) : (
+          <p>برای هماهنگی زمان مراجعه، تماس بگیرید یا نوبت آنلاین رزرو کنید. <Slot label="ساعات کاری" /></p>
+        )}
+        {site.instagram ? (
+          <p><a class="link-arrow" href={`https://instagram.com/${site.instagram}`} target="_blank" rel="noopener"><Icon name="instagram" /><bdi>@{site.instagram}</bdi></a></p>
+        ) : <Slot label="آدرس اینستاگرام" />}
+      </div>
+      <div class="reveal" style="--d:.08s"><MapCard /></div>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container"><VisitNotes /></div>
+  </section>
+</Base>

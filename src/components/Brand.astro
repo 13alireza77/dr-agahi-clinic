@@ -1,0 +1,15 @@
+---
+import { site, link } from "../lib/site";
+import Slot from "./Slot.astro";
+---
+<a class="brand" href={link("/")} aria-label={`${site.doctor} — صفحه‌ی اصلی`}>
+  {site.logo ? (
+    <img class="brand__logo" src={site.logo} alt="" width="44" height="44" />
+  ) : (
+    <span class="brand__text">
+      <span class="brand__name">{site.doctor}</span>
+      <span class="brand__latin wordmark-latin">{site.wordmark}</span>
+    </span>
+  )}
+  {!site.logo && <Slot label="لوگو" />}
+</a>

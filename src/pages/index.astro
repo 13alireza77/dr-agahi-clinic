@@ -1,0 +1,122 @@
+---
+import Base from "../layouts/Base.astro";
+import Photo from "../components/Photo.astro";
+import Icon from "../components/Icon.astro";
+import PalmShadow from "../components/PalmShadow.astro";
+import ContactPanel from "../components/ContactPanel.astro";
+import ServiceList from "../components/ServiceList.astro";
+import Credentials from "../components/Credentials.astro";
+import VisitNotes from "../components/VisitNotes.astro";
+import { site, fa, faPhone, telHref, link } from "../lib/site";
+import { webPage } from "../lib/schema";
+
+const title = "دکتر صدف آگاهی | مطب زیبایی پوست و مو در قلهک تهران";
+const description =
+  "بوتاکس، تزریق ژل، درمان ریزش مو و جوان‌سازی پوست در مطب دکتر صدف آگاهی، روبه‌روی متروی قلهک. رزرو نوبت تلفنی و از طریق پذیرش۲۴.";
+
+const steps = [
+  { title: "رزرو نوبت", text: "تلفنی یا آنلاین از طریق پذیرش۲۴، در زمانی که برایتان مناسب است." },
+  { title: "ویزیت و معاینه", text: "گفت‌وگو درباره‌ی خواسته‌ی شما و معاینه‌ی دقیق پوست و مو." },
+  { title: "پلن درمانی", text: "پلن پزشک و پلن فیشیال شما در پرونده‌تان ثبت می‌شود." },
+  { title: "درمان و پیگیری", text: "انجام درمان طبق برنامه و بررسی روند در جلسه‌های پیگیری." },
+];
+---
+<Base title={title} description={description} schema={[webPage("/", title, description)]}>
+  <!-- Hero -->
+  <section class="hero">
+    <PalmShadow seed={3} />
+    <div class="container hero__grid">
+      <div class="hero__text">
+        <span class="hero__latin wordmark-latin reveal">{site.wordmark}</span>
+        <span class="eyebrow reveal" style="--d:.05s">مطب زیبایی پوست و مو · قلهک</span>
+        <h1 class="reveal" style="--d:.1s">
+          <span class="display">{site.doctor}</span>
+          <span class="hero__sub">{site.tagline}</span>
+        </h1>
+        <p class="lead reveal" style="--d:.18s">
+          درمان ریزش مو، بوتاکس، تزریق ژل و جوان‌سازی پوست؛ با معاینه‌ی دقیق و پلن درمانی اختصاصی، با هدف نتیجه‌ای طبیعی و متناسب با چهره‌ی شما.
+        </p>
+        <div class="btn-row reveal" style="--d:.26s">
+          <a class="btn btn--primary" href={site.bookingUrl} target="_blank" rel="noopener"><Icon name="calendar" />رزرو آنلاین نوبت</a>
+          <a class="btn btn--ghost" href={telHref}><Icon name="phone" /><bdi>{faPhone(site.phone)}</bdi></a>
+        </div>
+        <div class="trust reveal" style="--d:.34s">
+          <span class="trust__item"><Icon name="shield" />نظام پزشکی {fa(site.irimc)} · <a href={site.irimcUrl} target="_blank" rel="noopener">استعلام</a></span>
+          <span class="trust__item"><Icon name="metro" />روبه‌روی متروی قلهک</span>
+        </div>
+      </div>
+
+      <div class="hero__media reveal" style="--d:.12s">
+        <span class="hero__ring" aria-hidden="true"></span>
+        <Photo name="doctor" shape="arch" eager alt={`پرتره‌ی ${site.doctor}`} label="پرتره‌ی دکتر آگاهی" sizes="(max-width: 900px) 78vw, 460px" />
+        <div class="hero__card">
+          <strong>{site.credentials[0]}</strong>
+          {site.credentials[1]}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section class="section" id="services" aria-labelledby="services-title">
+    <div class="container">
+      <header class="section-head section-head--center reveal">
+        <span class="eyebrow">خدمات مطب</span>
+        <h2 id="services-title" class="h2">مراقبت از پوست و مو، با برنامه‌ای مخصوص شما</h2>
+        <p class="muted">هر درمان با معاینه شروع می‌شود و بر اساس شرایط پوست و موی شما برنامه‌ریزی می‌شود.</p>
+      </header>
+      <ServiceList />
+    </div>
+  </section>
+
+  <!-- Journey -->
+  <section class="section section--tight" aria-labelledby="journey-title">
+    <div class="container">
+      <header class="section-head reveal">
+        <span class="eyebrow">مسیر مراجعه</span>
+        <h2 id="journey-title" class="h2">از اولین ویزیت تا پیگیری</h2>
+      </header>
+      <ol class="steps">
+        {steps.map((s, i) => (
+          <li class="step reveal" style={`--d:${i * 0.08}s`}>
+            <span class="step__n">{fa(i + 1)}</span>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="section" aria-labelledby="about-title">
+    <div class="container about">
+      <div class="about__media reveal">
+        <Photo name="clinic" shape="arch" alt="فضای مطب دکتر صدف آگاهی" label="فضای مطب" sizes="(max-width: 900px) 72vw, 400px" />
+      </div>
+      <div class="reveal" style="--d:.1s">
+        <span class="eyebrow">درباره‌ی دکتر</span>
+        <h2 id="about-title" class="h2" style="margin-top:12px">{site.doctor}</h2>
+        <p class="lead" style="margin-top:16px">
+          خدمات زیبایی پوست و مو با رویکردی علمی و مبتنی بر شواهد؛ در فضایی آرام، با زمان کافی برای گفت‌وگو و معاینه.
+        </p>
+        <Credentials />
+        <a class="link-arrow" href={link("/about/")} style="margin-top:26px">بیشتر درباره‌ی دکتر آگاهی <Icon name="arrow" /></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Before your visit -->
+  <section class="section section--tight" aria-labelledby="visit-title">
+    <div class="container">
+      <VisitNotes />
+    </div>
+  </section>
+
+  <!-- Booking & contact -->
+  <section class="section" id="contact" style="padding-top:0">
+    <div class="container">
+      <ContactPanel />
+    </div>
+  </section>
+</Base>

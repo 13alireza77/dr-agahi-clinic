@@ -1,0 +1,81 @@
+---
+import Base from "../layouts/Base.astro";
+import Photo from "../components/Photo.astro";
+import Icon from "../components/Icon.astro";
+import PalmShadow from "../components/PalmShadow.astro";
+import Credentials from "../components/Credentials.astro";
+import ContactPanel from "../components/ContactPanel.astro";
+import { site, link } from "../lib/site";
+import { breadcrumb, webPage } from "../lib/schema";
+
+const title = "درباره‌ی دکتر صدف آگاهی | مدارک و شماره نظام پزشکی";
+const description =
+  "دکتر صدف آگاهی، دکترای حرفه‌ای پزشکی از دانشگاه علوم پزشکی تهران و دارای مدرک زیبایی از دانشگاه علوم پزشکی شهید بهشتی. نظام پزشکی ۲۲۳۲۴۴.";
+
+const values = [
+  { title: "معاینه پیش از هر درمان", text: "هر درمان با شناخت پوست، مو و سابقه‌ی پزشکی شما شروع می‌شود." },
+  { title: "نتیجه‌ی طبیعی", text: "هدف، هماهنگی با چهره‌ی خودتان است؛ نه تغییر آن." },
+  { title: "پرونده و پیگیری", text: "پلن پزشک و پلن فیشیال شما در پرونده ثبت و در هر جلسه پیگیری می‌شود." },
+];
+---
+<Base
+  title={title}
+  description={description}
+  schema={[webPage("/about/", title, description, "ProfilePage"), breadcrumb([{ name: "خانه", url: "/" }, { name: "درباره‌ی دکتر", url: "/about/" }])]}
+>
+  <section class="page-hero">
+    <PalmShadow seed={21} />
+    <div class="container">
+      <nav class="crumbs" aria-label="مسیر صفحه">
+        <ol><li><a href={link("/")}>خانه</a></li><li aria-current="page">درباره‌ی دکتر</li></ol>
+      </nav>
+      <div class="page-hero__grid about" style="margin-top:28px">
+        <div class="about__media reveal">
+          <Photo name="doctor" shape="arch" eager alt={`پرتره‌ی ${site.doctor}`} label="پرتره‌ی دکتر آگاهی" sizes="(max-width: 900px) 72vw, 400px" />
+        </div>
+        <div>
+          <span class="hero__latin wordmark-latin reveal">{site.wordmark}</span>
+          <span class="eyebrow reveal">درباره‌ی دکتر</span>
+          <h1 class="reveal" style="--d:.06s">{site.doctor}</h1>
+          <p class="lead reveal" style="--d:.12s">
+            دکتر صدف آگاهی، دانش‌آموخته‌ی دانشگاه علوم پزشکی تهران، خدمات زیبایی پوست و مو را در مطب خود در قلهک ارائه می‌دهد؛ با رویکردی علمی و مبتنی بر شواهد و زمان کافی برای گفت‌وگو و معاینه.
+          </p>
+          <div class="reveal" style="--d:.18s"><Credentials /></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container">
+      <header class="section-head reveal">
+        <span class="eyebrow">رویکرد</span>
+        <h2 class="h2">آنچه در مطب برای ما مهم است</h2>
+      </header>
+      <ul class="items">
+        {values.map((v, i) => (
+          <li class="item reveal" style={`--d:${i * 0.07}s`}>
+            <h3>{v.title}</h3>
+            <hr class="rule" />
+            <p>{v.text}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container cta-band reveal">
+      <span class="eyebrow">خدمات</span>
+      <h2 class="h2" style="margin-top:12px">درمان ریزش مو، بوتاکس، تزریق ژل و جوان‌سازی</h2>
+      <p class="muted">برای آشنایی با هر خدمت و مسیر درمان آن، صفحه‌ی خدمات را ببینید.</p>
+      <div class="btn-row">
+        <a class="btn btn--ghost" href={link("/services/")}>مشاهده‌ی خدمات <Icon name="arrow" /></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="container"><ContactPanel /></div>
+  </section>
+</Base>

@@ -1,0 +1,67 @@
+---
+// The brown "poster bottom" panel: booking, phone, address, hours and map.
+import { site, fa, faPhone, telHref } from "../lib/site";
+import Icon from "./Icon.astro";
+import MapCard from "./MapCard.astro";
+import PalmShadow from "./PalmShadow.astro";
+import Slot from "./Slot.astro";
+
+interface Props { headingLevel?: "h2" | "h3"; }
+const { headingLevel: H = "h2" } = Astro.props;
+---
+<section class="panel reveal" aria-labelledby="contact-title">
+  <PalmShadow seed={11} />
+  <div class="contact-grid">
+    <div>
+      <span class="eyebrow">رزرو نوبت</span>
+      <H id="contact-title" class="h2" style="margin-top:12px">{site.bookingText}</H>
+      <div class="btn-row" style="margin-top:28px">
+        <a class="btn btn--light" href={site.bookingUrl} target="_blank" rel="noopener"><Icon name="calendar" />رزرو آنلاین در پذیرش۲۴</a>
+        <a class="btn btn--outline-light" href={telHref}><Icon name="phone" />تماس تلفنی</a>
+      </div>
+
+      <ul class="contact-list">
+        <li>
+          <span class="ic"><Icon name="phone" /></span>
+          <div>
+            <small>تلفن و رزرو نوبت</small>
+            <a class="val" href={telHref}><bdi>{faPhone(site.phone)}</bdi></a>
+            {site.landline ? <small>تلفن ثابت: <bdi>{fa(site.landline)}</bdi></small> : <Slot label="تلفن ثابت" />}
+          </div>
+        </li>
+        <li>
+          <span class="ic"><Icon name="pin" /></span>
+          <div>
+            <small>نشانی مطب</small>
+            <address class="val" style="font-style:normal">{site.address}</address>
+          </div>
+        </li>
+        <li>
+          <span class="ic"><Icon name="clock" /></span>
+          <div>
+            <small>ساعات کاری</small>
+            {site.hours.length ? (
+              <span class="val">{site.hours.map((h: { days: string; time: string }) => `${h.days}: ${fa(h.time)}`).join("، ")}</span>
+            ) : (
+              <span class="val">برای هماهنگی زمان مراجعه، تماس بگیرید یا نوبت آنلاین رزرو کنید. <Slot label="ساعات کاری" /></span>
+            )}
+          </div>
+        </li>
+        {(site.instagram || import.meta.env.DEV) && (
+          <li>
+            <span class="ic"><Icon name="instagram" /></span>
+            <div>
+              <small>اینستاگرام</small>
+              {site.instagram ? (
+                <a class="val" href={`https://instagram.com/${site.instagram}`} target="_blank" rel="noopener"><bdi>@{site.instagram}</bdi></a>
+              ) : (
+                <Slot label="آدرس اینستاگرام" />
+              )}
+            </div>
+          </li>
+        )}
+      </ul>
+    </div>
+    <MapCard />
+  </div>
+</section>

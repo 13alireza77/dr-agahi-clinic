@@ -1,0 +1,47 @@
+---
+import { site, fa, faPhone, telHref, link } from "../lib/site";
+import { getServices, serviceUrl } from "../lib/services";
+import Brand from "./Brand.astro";
+import Icon from "./Icon.astro";
+
+const services = await getServices();
+const path = Astro.url.pathname;
+const nav = [
+  { href: link("/services/"), label: "خدمات" },
+  { href: link("/about/"), label: "درباره‌ی دکتر" },
+  { href: link("/booking/"), label: "رزرو و تماس" },
+];
+const current = (href: string) => (path === href || (href !== "/" && path.startsWith(href)) ? "page" : undefined);
+---
+<header class="site-header">
+  <div class="container site-header__inner">
+    <Brand />
+
+    <nav class="nav" aria-label="منوی اصلی">
+      {nav.map((n) => <a href={n.href} aria-current={current(n.href)}>{n.label}</a>)}
+    </nav>
+    <div class="header-cta">
+      <a class="header-phone" href={telHref}><Icon name="phone" /><bdi>{faPhone(site.phone)}</bdi></a>
+      <a class="btn btn--primary btn--sm" href={site.bookingUrl} target="_blank" rel="noopener">رزرو نوبت</a>
+    </div>
+
+    <details class="menu">
+      <summary aria-label="باز کردن منو"><span></span></summary>
+      <div class="menu__panel">
+        <a class="menu__link" href={link("/")}>خانه</a>
+        <a class="menu__link" href={link("/services/")}>خدمات <Icon name="arrow" class="link-ic" /></a>
+        {services.map((s) => <a class="menu__sub" href={link(serviceUrl(s.id))}>{s.data.title}</a>)}
+        <a class="menu__link" href={link("/about/")}>درباره‌ی دکتر</a>
+        <a class="menu__link" href={link("/booking/")}>رزرو نوبت و تماس</a>
+        <div class="menu__foot">
+          <span>{site.address}</span>
+          <span>نظام پزشکی: {fa(site.irimc)}</span>
+        </div>
+      </div>
+    </details>
+  </div>
+</header>
+
+<style>
+  .menu__link :global(svg) { width: 20px; height: 20px; color: var(--muted); }
+</style>

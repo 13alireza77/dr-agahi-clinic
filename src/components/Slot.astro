@@ -1,0 +1,6 @@
+---
+// Marks a reserved spot for information that is still missing. Visible only in `npm run dev`.
+interface Props { label: string; }
+const { label } = Astro.props;
+---
+{import.meta.env.DEV && <span class="slot">در انتظار: {label}</span>}
