@@ -11,18 +11,21 @@ const nav = [
   { href: link("/about/"), label: "درباره‌ی دکتر" },
   { href: link("/booking/"), label: "رزرو و تماس" },
 ];
+// On the home page the Home icon scrolls back to the top instead of reloading.
+const homeHref = path === link("/") ? "#top" : link("/");
 const current = (href: string) => (path === href || (href !== "/" && path.startsWith(href)) ? "page" : undefined);
 ---
 <header class="site-header">
   <div class="container site-header__inner">
     <Brand />
+    <a class="home-btn" href={homeHref} aria-label="خانه" title="خانه"><Icon name="home" /></a>
 
     <nav class="nav" aria-label="منوی اصلی">
       {nav.map((n) => <a href={n.href} aria-current={current(n.href)}>{n.label}</a>)}
     </nav>
     <div class="header-cta">
       <a class="header-phone" href={telHref}><Icon name="phone" /><bdi>{faPhone(site.phone)}</bdi></a>
-      <a class="btn btn--primary btn--sm" href={site.bookingUrl} target="_blank" rel="noopener">رزرو نوبت</a>
+      <a class="btn btn--primary btn--sm" href={link("/booking/")}>رزرو نوبت</a>
     </div>
 
     <details class="menu">

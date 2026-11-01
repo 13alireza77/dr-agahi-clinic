@@ -28,7 +28,6 @@ const steps = [
     <div class="container hero__grid">
       <div class="hero__text">
         <span class="hero__latin wordmark-latin reveal">{site.wordmark}</span>
-        <span class="eyebrow reveal" style="--d:.05s">مطب زیبایی پوست و مو · قلهک</span>
         <h1 class="reveal" style="--d:.1s">
           <span class="display">{site.doctor}</span>
           <span class="hero__sub">{site.tagline}</span>
@@ -37,7 +36,7 @@ const steps = [
           درمان جوش و ریزش مو، بوتاکس، فیشیال و جوان‌سازی پوست؛ با معاینه‌ی دقیق و پلن درمانی اختصاصی، با هدف نتیجه‌ای طبیعی و متناسب با چهره‌ی شما.
         </p>
         <div class="btn-row reveal" style="--d:.26s">
-          <a class="btn btn--primary" href={site.bookingUrl} target="_blank" rel="noopener"><Icon name="calendar" />رزرو آنلاین نوبت</a>
+          <a class="btn btn--primary" href={link("/booking/")}><Icon name="calendar" />رزرو نوبت</a>
           <a class="btn btn--ghost" href={telHref}><Icon name="phone" /><bdi>{faPhone(site.phone)}</bdi></a>
         </div>
         <div class="trust reveal" style="--d:.34s">

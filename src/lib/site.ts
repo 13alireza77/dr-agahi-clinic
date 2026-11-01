@@ -12,6 +12,9 @@ export const faPhone = (phone: string) =>
 
 export const telHref = `tel:${site.phoneIntl}`;
 
+/** Bale profile link from the clinic's Bale ID (Bale links go by ID, not phone number). */
+export const baleHref = site.bale ? `https://ble.ir/${site.bale}` : "";
+
 const { lat, lng } = site.geo;
 export const mapLinks = {
   // Neshan's web map has no pin-by-coordinates URL, so this is a share link (nshn.ir/…) copied from the Neshan app.

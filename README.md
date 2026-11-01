@@ -26,6 +26,7 @@ npm run preview   # serve dist/ locally
 - `logo` — put the file in `public/` (e.g. `public/logo.svg`) and set `"logo": "/logo.svg"`.
 - `landline` — digits only, e.g. `"02122223333"`.
 - `instagram` — handle without `@`.
+- `bale` — the clinic's Bale ID without `@` (the booking page links to `https://ble.ir/<id>`; Bale has no link-by-phone-number). Until it is set, the Bale option shows «به‌زودی».
 - `hours` — e.g.
   ```json
   "hours": [

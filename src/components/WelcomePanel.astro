@@ -1,0 +1,37 @@
+---
+// Shown once per visit when someone first opens the site: a side drawer on desktop, a bottom sheet on phones.
+// Kept small on phones so it doesn't count as an intrusive interstitial for Google.
+import { site } from "../lib/site";
+import Icon from "./Icon.astro";
+import BookingOptions from "./BookingOptions.astro";
+import PalmShadow from "./PalmShadow.astro";
+---
+<dialog class="welcome" aria-labelledby="welcome-title">
+  <PalmShadow seed={23} />
+  <form method="dialog" class="welcome__close-form">
+    <button class="welcome__close" aria-label="بستن"><Icon name="close" /></button>
+  </form>
+  <div class="welcome__body">
+    <p id="welcome-title" class="welcome__title">نیاز به راهنمایی دارید؟</p>
+    <p class="welcome__text">برای مشاوره و رزرو نوبت، از یکی از این راه‌ها با مطب در تماس باشید.</p>
+    <BookingOptions variant="compact" />
+  </div>
+  <div class="welcome__mark" aria-hidden="true">
+    <span>Dr.</span><span>Sadaf</span><span>Agahi</span>
+    <small>{site.wordmark}</small>
+  </div>
+</dialog>
+
+<script is:inline>
+  (() => {
+    const d = document.querySelector("dialog.welcome");
+    if (!d || !d.showModal || location.pathname.endsWith("/booking/")) return;
+    let seen = false;
+    try { seen = sessionStorage.getItem("welcome-seen") === "1"; } catch {}
+    if (seen) return;
+    d.addEventListener("close", () => { try { sessionStorage.setItem("welcome-seen", "1"); } catch {} });
+    // Click on the dimmed backdrop closes it
+    d.addEventListener("click", (e) => { if (e.target === d) d.close(); });
+    setTimeout(() => d.showModal(), 500);
+  })();
+</script>

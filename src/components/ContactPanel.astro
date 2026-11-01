@@ -1,6 +1,6 @@
 ---
 // The brown "poster bottom" panel: booking, phone, address, hours and map.
-import { site, fa, faPhone, telHref } from "../lib/site";
+import { site, fa, faPhone, telHref, link } from "../lib/site";
 import Icon from "./Icon.astro";
 import MapCard from "./MapCard.astro";
 import PalmShadow from "./PalmShadow.astro";
@@ -16,7 +16,7 @@ const { headingLevel: H = "h2" } = Astro.props;
       <span class="eyebrow">رزرو نوبت</span>
       <H id="contact-title" class="h2" style="margin-top:12px">{site.bookingText}</H>
       <div class="btn-row" style="margin-top:28px">
-        <a class="btn btn--light" href={site.bookingUrl} target="_blank" rel="noopener"><Icon name="calendar" />رزرو آنلاین در پذیرش۲۴</a>
+        <a class="btn btn--light" href={link("/booking/")}><Icon name="calendar" />رزرو نوبت</a>
         <a class="btn btn--outline-light" href={telHref}><Icon name="phone" />تماس تلفنی</a>
       </div>
 

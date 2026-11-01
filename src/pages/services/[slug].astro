@@ -48,7 +48,7 @@ const schema = [
           <h1 class="reveal" style="--d:.06s">{d.title}</h1>
           <p class="lead reveal" style="--d:.12s">{d.lead}</p>
           <div class="btn-row reveal" style="--d:.18s">
-            <a class="btn btn--primary" href={site.bookingUrl} target="_blank" rel="noopener"><Icon name="calendar" />رزرو نوبت مشاوره</a>
+            <a class="btn btn--primary" href={link("/booking/")}><Icon name="calendar" />رزرو نوبت مشاوره</a>
             <a class="btn btn--ghost" href={telHref}><Icon name="phone" /><bdi>{faPhone(site.phone)}</bdi></a>
           </div>
         </div>

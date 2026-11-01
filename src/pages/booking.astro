@@ -5,12 +5,13 @@ import PalmShadow from "../components/PalmShadow.astro";
 import MapCard from "../components/MapCard.astro";
 import VisitNotes from "../components/VisitNotes.astro";
 import Slot from "../components/Slot.astro";
-import { site, fa, faPhone, telHref, link } from "../lib/site";
+import BookingOptions from "../components/BookingOptions.astro";
+import { site, fa, link } from "../lib/site";
 import { breadcrumb, webPage } from "../lib/schema";
 
 const title = "رزرو نوبت و نشانی مطب دکتر صدف آگاهی | قلهک تهران";
 const description =
-  "رزرو نوبت مطب دکتر صدف آگاهی؛ تلفنی با شماره‌ی ۰۹۱۰۲۳۸۴۶۴۹ یا آنلاین از طریق پذیرش۲۴. نشانی: روبه‌روی متروی قلهک، خیابان شهید کدویی، ساختمان پزشکان آرامش.";
+  "رزرو نوبت مطب دکتر صدف آگاهی؛ با پیام در بله، تماس با ۰۹۱۰۲۳۸۴۶۴۹ یا آنلاین از طریق پذیرش۲۴. نشانی: روبه‌روی متروی قلهک، خیابان شهید کدویی، ساختمان پزشکان آرامش.";
 ---
 <Base
   title={title}
@@ -26,24 +27,13 @@ const description =
       <header class="section-head" style="margin-top:28px">
         <span class="eyebrow reveal">رزرو نوبت</span>
         <h1 class="reveal" style="--d:.06s">{site.bookingText}</h1>
-        <p class="lead reveal" style="--d:.12s;margin-top:16px">روش دلخواهتان را انتخاب کنید؛ هر دو راه به یک نوبت می‌رسند.</p>
+        <p class="lead reveal" style="--d:.12s;margin-top:16px">یکی از این سه راه را انتخاب کنید؛ همه به یک نوبت می‌رسند.</p>
       </header>
 
-      <div class="book-cards">
-        <a class="book-card book-card--dark reveal" href={site.bookingUrl} target="_blank" rel="noopener">
-          <span class="book-card__ic"><Icon name="calendar" /></span>
-          <h2>رزرو آنلاین در پذیرش۲۴</h2>
-          <p>زمان‌های خالی را ببینید و در چند دقیقه نوبت بگیرید.</p>
-          <span class="btn btn--light">ورود به صفحه‌ی رزرو <Icon name="external" /></span>
-        </a>
-        <a class="book-card book-card--light reveal" style="--d:.08s" href={telHref}>
-          <span class="book-card__ic"><Icon name="phone" /></span>
-          <h2>رزرو تلفنی</h2>
-          <p class="big"><bdi>{faPhone(site.phone)}</bdi></p>
-          {site.landline ? <p>تلفن ثابت: <bdi>{fa(site.landline)}</bdi></p> : <Slot label="تلفن ثابت" />}
-          <span class="btn btn--primary">تماس بگیرید <Icon name="phone" /></span>
-        </a>
-      </div>
+      <BookingOptions />
+      <p class="muted reveal" style="margin-top:22px">
+        {site.landline ? <>تلفن ثابت مطب: <bdi>{fa(site.landline)}</bdi></> : <Slot label="تلفن ثابت" />}
+      </p>
     </div>
   </section>
 

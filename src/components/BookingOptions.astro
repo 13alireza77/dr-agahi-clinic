@@ -1,0 +1,42 @@
+---
+// The three ways to book: Bale message, phone call, Paziresh24.
+// `cards` on the booking page; `compact` (icon tiles) in the welcome panel.
+import { site, faPhone, telHref, baleHref } from "../lib/site";
+import Icon from "./Icon.astro";
+import Slot from "./Slot.astro";
+
+interface Props { variant?: "cards" | "compact"; }
+const { variant = "cards" } = Astro.props;
+
+const options = [
+  { icon: "chat", title: "پیام در بله", text: "سؤال یا درخواست نوبت را در بله بفرستید.", href: baleHref, external: true, pending: !baleHref },
+  { icon: "phone", title: "تماس تلفنی", text: faPhone(site.phone), href: telHref, external: false, ltr: true },
+  { icon: "calendar", title: "پذیرش۲۴", text: "زمان‌های خالی را ببینید و آنلاین نوبت بگیرید.", href: site.bookingUrl, external: true },
+] as const;
+---
+<ul class:list={["book-opts", `book-opts--${variant}`]}>
+  {options.map((o, i) => {
+    const Tag = o.href ? "a" : "div";
+    return (
+      <li class="reveal" style={`--d:${i * 0.07}s`}>
+        <Tag
+          class:list={["book-opt", { "is-pending": "pending" in o && o.pending }]}
+          href={o.href || undefined}
+          target={o.href && o.external ? "_blank" : undefined}
+          rel={o.href && o.external ? "noopener" : undefined}
+        >
+          <span class="book-opt__ic"><Icon name={o.icon} /></span>
+          <span class="book-opt__body">
+            <strong>{o.title}</strong>
+            {variant === "cards" && (
+              "ltr" in o ? <span class="book-opt__text"><bdi>{o.text}</bdi></span>
+              : "pending" in o && o.pending ? <span class="book-opt__text">به‌زودی <Slot label="شناسه‌ی بله (site.json → bale)" /></span>
+              : <span class="book-opt__text">{o.text}</span>
+            )}
+          </span>
+          {variant === "cards" && o.href && <Icon name="arrow" class="book-opt__go" />}
+        </Tag>
+      </li>
+    );
+  })}
+</ul>

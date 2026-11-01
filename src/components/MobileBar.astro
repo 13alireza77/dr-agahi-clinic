@@ -1,10 +1,10 @@
 ---
-import { site, telHref } from "../lib/site";
+import { telHref, link } from "../lib/site";
 import Icon from "./Icon.astro";
 ---
 <div class="mbar" role="region" aria-label="رزرو نوبت">
   <div class="mbar__inner">
     <a class="btn btn--ghost" href={telHref}><Icon name="phone" />تماس</a>
-    <a class="btn btn--primary" href={site.bookingUrl} target="_blank" rel="noopener"><Icon name="calendar" />رزرو آنلاین نوبت</a>
+    <a class="btn btn--primary" href={link("/booking/")}><Icon name="calendar" />رزرو نوبت</a>
   </div>
 </div>
