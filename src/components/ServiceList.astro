@@ -1,30 +1,45 @@
 ---
-// Services staggered diagonally, as on the printed poster.
+// Services staggered diagonally, as on the printed poster: 9:16 poster beside its title and icon bullets.
+// Informational only (no links); the service pages are reached from the header and footer.
+// `exclude` + `strip` reuse it as the "other services" row on service pages.
 import { getServices, serviceUrl } from "../lib/services";
 import { fa, link } from "../lib/site";
 import Photo from "./Photo.astro";
 import Icon from "./Icon.astro";
 
-interface Props { headingLevel?: "h2" | "h3"; }
-const { headingLevel: H = "h3" } = Astro.props;
-const services = await getServices();
+interface Props { headingLevel?: "h2" | "h3"; exclude?: string; strip?: boolean; }
+const { headingLevel: H = "h3", exclude, strip = false } = Astro.props;
+const services = (await getServices()).filter((s) => s.id !== exclude);
 ---
-<div class="services">
-  {services.map((s, i) => (
-    <a class="svc reveal" href={link(serviceUrl(s.id))}>
-      <div class="svc__media">
-        <span class="svc__num" aria-hidden="true">{fa(i + 1)}</span>
-        <Photo name={s.data.photo} alt={s.data.photoAlt} label={s.data.title} sizes="(max-width: 700px) 40vw, 440px" />
-      </div>
-      <div class="svc__body">
-        <H>{s.data.title}</H>
-        <hr class="rule" />
-        <p>{s.data.short}</p>
-        {s.data.items.length > 0 && (
-          <div class="svc__tags">{s.data.items.map((it) => <span class="tag">{it.title}</span>)}</div>
-        )}
-        <span class="link-arrow">بیشتر بدانید <Icon name="arrow" /></span>
-      </div>
-    </a>
-  ))}
-</div>
+{strip ? (
+  <div class="posters posters--strip">
+    {services.map((s, i) => (
+      <a class="poster reveal" href={link(serviceUrl(s.id))} style={`--d:${(i % 5) * 0.06}s`}>
+        <Photo name={s.data.photo} alt={s.data.photoAlt} label={s.data.title} sizes="(max-width: 699px) 40vw, 220px" />
+        <div class="poster__title"><H>{s.data.title}</H><Icon name="arrow" /></div>
+      </a>
+    ))}
+  </div>
+) : (
+  <div class="services">
+    {services.map((s, i) => (
+      <article class="svc reveal">
+        <div class="svc__media">
+          <span class="svc__num" aria-hidden="true">{fa(i + 1)}</span>
+          <Photo name={s.data.photo} alt={s.data.photoAlt} label={s.data.title} sizes="(max-width: 699px) 40vw, 300px" />
+        </div>
+        <div class="svc__body">
+          <H>{s.data.title}</H>
+          <span class="ornament" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M6 0c.6 3.4 2.6 5.4 6 6-3.4.6-5.4 2.6-6 6-.6-3.4-2.6-5.4-6-6 3.4-.6 5.4-2.6 6-6Z" /></svg></span>
+          <p class="svc__lead">{s.data.lead}</p>
+          <span class="svc__label">{s.data.highlights.title}</span>
+          <ul class="svc__parts">
+            {s.data.highlights.items.map((x) => (
+              <li><span class="svc__ic"><Icon name={x.icon as any} /></span>{x.text}</li>
+            ))}
+          </ul>
+        </div>
+      </article>
+    ))}
+  </div>
+)}

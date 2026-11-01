@@ -24,7 +24,7 @@ export function baseGraph(services: { title: string; url: string; description: s
       "@id": ids.clinic,
       name: site.name,
       alternateName: [`مطب ${site.doctorPlain}`, `${site.doctor} ${site.wordmark}`],
-      description: `${site.tagline}: درمان ریزش مو، بوتاکس، تزریق ژل و جوان‌سازی پوست در قلهک تهران.`,
+      description: `${site.tagline}: درمان جوش، بوتاکس، برداشت خال، فیشیال، درمان ریزش مو و جوان‌سازی پوست در قلهک تهران.`,
       url: abs("/"),
       telephone: site.phoneIntl,
       image: abs("/og.jpg"),

@@ -1,6 +1,7 @@
 ---
 // Drop a file named `<name>.jpg|png|webp` into src/assets/photos/ and it replaces the placeholder.
-// Images are converted to AVIF/WebP at build time and lazy-loaded unless `eager` is set.
+// Images are converted to WebP (quality 85) at build time and lazy-loaded unless `eager` is set.
+// AVIF was dropped: at its default quality it blurred the poster text, and at matching quality it was larger.
 import { Picture } from "astro:assets";
 import type { ImageMetadata } from "astro";
 
@@ -24,8 +25,10 @@ const showLabel = import.meta.env.DEV && label;
     <Picture
       src={src}
       alt={alt}
-      formats={["avif", "webp"]}
+      formats={["webp"]}
+      fallbackFormat="jpg"
       widths={[360, 560, 800, 1120]}
+      quality={85}
       sizes={sizes}
       loading={eager ? "eager" : "lazy"}
       fetchpriority={eager ? "high" : "auto"}

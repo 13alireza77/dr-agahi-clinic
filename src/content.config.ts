@@ -15,6 +15,8 @@ const services = defineCollection({
     lead: z.string(),
     itemsTitle: z.string(),
     items: z.array(z.object({ id: z.string(), title: z.string(), text: z.string() })).default([]),
+    // Bullets on the services list; `icon` is a name from components/Icon.astro.
+    highlights: z.object({ title: z.string(), items: z.array(z.object({ text: z.string(), icon: z.string() })) }),
     suitable: z.array(z.string()).default([]),
     steps: z.array(z.object({ title: z.string(), text: z.string() })).default([]),
     faq: z.array(z.object({ q: z.string(), a: z.string() })).default([]),

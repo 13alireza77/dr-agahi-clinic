@@ -2,6 +2,7 @@
 import { render } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import Photo from "../../components/Photo.astro";
+import ServiceList from "../../components/ServiceList.astro";
 import Icon from "../../components/Icon.astro";
 import PalmShadow from "../../components/PalmShadow.astro";
 import ContactPanel from "../../components/ContactPanel.astro";
@@ -12,14 +13,13 @@ import { breadcrumb, faqPage, webPage } from "../../lib/schema";
 
 export async function getStaticPaths() {
   const services = await getServices();
-  return services.map((service) => ({ params: { slug: service.id }, props: { service, all: services } }));
+  return services.map((service) => ({ params: { slug: service.id }, props: { service } }));
 }
 
-const { service, all } = Astro.props;
+const { service } = Astro.props;
 const d = service.data;
 const { Content } = await render(service);
 const url = serviceUrl(service.id);
-const related = all.filter((s) => s.id !== service.id);
 
 const schema = [
   webPage(url, d.seoTitle, d.description, "MedicalWebPage"),
@@ -52,8 +52,8 @@ const schema = [
             <a class="btn btn--ghost" href={telHref}><Icon name="phone" /><bdi>{faPhone(site.phone)}</bdi></a>
           </div>
         </div>
-        <div class="page-hero__media reveal" style="--d:.1s">
-          <Photo name={d.photo} alt={d.photoAlt} label={d.photoAlt} eager sizes="(max-width: 900px) 92vw, 520px" />
+        <div class="page-hero__media page-hero__media--poster reveal" style="--d:.1s">
+          <Photo name={d.photo} alt={d.photoAlt} label={d.photoAlt} eager sizes="(max-width: 899px) 80vw, 400px" />
         </div>
       </div>
     </div>
@@ -150,17 +150,7 @@ const schema = [
         <span class="eyebrow">خدمات دیگر</span>
         <h2 id="related-title" class="h3" style="margin-top:10px">شاید این خدمات هم برایتان مفید باشد</h2>
       </header>
-      <div class="related">
-        {related.map((s, i) => (
-          <a href={link(serviceUrl(s.id))} class="reveal" style={`--d:${i * 0.07}s`}>
-            <Photo name={s.data.photo} alt={s.data.photoAlt} sizes="(max-width: 700px) 110px, 360px" />
-            <div>
-              <h3>{s.data.title}</h3>
-              <p>{s.data.short}</p>
-            </div>
-          </a>
-        ))}
-      </div>
+      <ServiceList exclude={service.id} strip />
     </div>
   </section>
 

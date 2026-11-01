@@ -42,9 +42,10 @@ Drop images into `src/assets/photos/` with these names (jpg/png/webp, at least 1
 |---|---|
 | `doctor` | Hero + About portrait (portrait orientation, ~4:5) |
 | `clinic` | Clinic interior, home "About" section |
-| `hair` | Hair loss (poster photo: hair with serum drop) |
-| `eye` | Botox (poster photo: eye) |
-| `lips` | Fillers (poster photo: lips) |
-| `skin` | Rejuvenation (poster photo: skin with water drops) |
+| `<service-id>` | Service poster, 9:16 (e.g. `acne.webp` for `src/content/services/acne.md`). The file name is the `photo:` field of the service. |
+
+Current posters: `acne`, `botox`, `moles`, `facial`, `hair-loss`, `rejuvenation`. To add a service, copy one `.md` file, change `order`, `title`, `photo` and the text, and add its poster.
+
+The bullets beside each poster on the services list come from `highlights` in the service file; each has a `text` and an `icon` (a name from `src/components/Icon.astro`, e.g. `drop`, `sparkle`, `shield`, `eye`).
 
 Also needed before launch: `public/og.jpg` (1200×630, shown when the link is shared) and `public/apple-touch-icon.png` (180×180).
