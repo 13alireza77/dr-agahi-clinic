@@ -9,13 +9,14 @@ import Icon from "./Icon.astro";
 
 interface Props { headingLevel?: "h2" | "h3"; exclude?: string; strip?: boolean; }
 const { headingLevel: H = "h3", exclude, strip = false } = Astro.props;
-const services = (await getServices()).filter((s) => s.id !== exclude);
+// Only services with a poster; the poster list also needs the highlight bullets.
+const services = (await getServices()).filter((s) => s.id !== exclude && s.data.photo && (strip || s.data.highlights));
 ---
 {strip ? (
   <div class="posters posters--strip">
     {services.map((s, i) => (
       <a class="poster reveal" href={link(serviceUrl(s.id))} style={`--d:${(i % 5) * 0.06}s`}>
-        <Photo name={s.data.photo} alt={s.data.photoAlt} label={s.data.title} sizes="(max-width: 699px) 40vw, 220px" />
+        <Photo name={s.data.photo!} alt={s.data.photoAlt} label={s.data.title} sizes="(max-width: 699px) 40vw, 220px" />
         <div class="poster__title"><H>{s.data.title}</H><Icon name="arrow" /></div>
       </a>
     ))}
@@ -26,15 +27,15 @@ const services = (await getServices()).filter((s) => s.id !== exclude);
       <article class="svc reveal">
         <div class="svc__media">
           <span class="svc__num" aria-hidden="true">{fa(i + 1)}</span>
-          <Photo name={s.data.photo} alt={s.data.photoAlt} label={s.data.title} sizes="(max-width: 699px) 40vw, 300px" />
+          <Photo name={s.data.photo!} alt={s.data.photoAlt} label={s.data.title} sizes="(max-width: 699px) 40vw, 300px" />
         </div>
         <div class="svc__body">
           <H>{s.data.title}</H>
           <span class="ornament" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M6 0c.6 3.4 2.6 5.4 6 6-3.4.6-5.4 2.6-6 6-.6-3.4-2.6-5.4-6-6 3.4-.6 5.4-2.6 6-6Z" /></svg></span>
           <p class="svc__lead">{s.data.lead}</p>
-          <span class="svc__label">{s.data.highlights.title}</span>
+          <span class="svc__label">{s.data.highlights!.title}</span>
           <ul class="svc__parts">
-            {s.data.highlights.items.map((x) => (
+            {s.data.highlights!.items.map((x) => (
               <li><span class="svc__ic"><Icon name={x.icon as any} /></span>{x.text}</li>
             ))}
           </ul>

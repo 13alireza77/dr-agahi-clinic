@@ -7,7 +7,6 @@ import Icon from "./Icon.astro";
 const services = await getServices();
 const path = Astro.url.pathname;
 const nav = [
-  { href: link("/services/"), label: "خدمات" },
   { href: link("/about/"), label: "درباره‌ی دکتر" },
   { href: link("/booking/"), label: "رزرو و تماس" },
 ];
@@ -21,6 +20,23 @@ const current = (href: string) => (path === href || (href !== "/" && path.starts
     <a class="home-btn" href={homeHref} aria-label="خانه" title="خانه"><Icon name="home" /></a>
 
     <nav class="nav" aria-label="منوی اصلی">
+      {/* Services dropdown: opens on hover / keyboard focus; the label itself goes to the services page */}
+      <div class="nav-dd">
+        <a href={link("/services/")} aria-current={current(link("/services/"))} aria-haspopup="true">خدمات<Icon name="chevron" class="nav-dd__chev" /></a>
+        <div class="nav-dd__panel">
+          <ul>
+            {services.map((s) => (
+              <li>
+                <a href={link(serviceUrl(s.id))} aria-current={current(link(serviceUrl(s.id)))}>
+                  <strong>{s.data.title}</strong>
+                  <small>{s.data.short}</small>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <a class="nav-dd__all" href={link("/services/")}>همه‌ی خدمات<Icon name="arrow" /></a>
+        </div>
+      </div>
       {nav.map((n) => <a href={n.href} aria-current={current(n.href)}>{n.label}</a>)}
     </nav>
     <div class="header-cta">

@@ -7,7 +7,7 @@ import BookingOptions from "./BookingOptions.astro";
 import PalmShadow from "./PalmShadow.astro";
 ---
 <dialog class="welcome" aria-labelledby="welcome-title">
-  <PalmShadow seed={23} />
+  <div class="welcome__bg" aria-hidden="true"><PalmShadow seed={23} /></div>
   <form method="dialog" class="welcome__close-form">
     <button class="welcome__close" aria-label="بستن"><Icon name="close" /></button>
   </form>

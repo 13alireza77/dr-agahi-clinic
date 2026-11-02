@@ -6,7 +6,6 @@ import ServiceList from "../../components/ServiceList.astro";
 import Icon from "../../components/Icon.astro";
 import PalmShadow from "../../components/PalmShadow.astro";
 import ContactPanel from "../../components/ContactPanel.astro";
-import Slot from "../../components/Slot.astro";
 import { getServices, serviceUrl } from "../../lib/services";
 import { site, fa, faPhone, telHref, link } from "../../lib/site";
 import { breadcrumb, faqPage, webPage } from "../../lib/schema";
@@ -18,8 +17,16 @@ export async function getStaticPaths() {
 
 const { service } = Astro.props;
 const d = service.data;
-const { Content } = await render(service);
+const { Content, headings } = await render(service);
 const url = serviceUrl(service.id);
+
+const careTitle = d.care.length === 1 ? `نکات ${d.care[0].title}` : "نکات قبل و بعد از تزریق";
+// Table of contents: the article's own headings, then the notes and care cards
+const toc = [
+  ...headings.filter((h) => h.depth === 2).map((h) => ({ id: h.slug, text: h.text })),
+  ...(d.considerations.length ? [{ id: "considerations", text: "نکات مهم قبل از تصمیم‌گیری" }] : []),
+  ...(d.care.length ? [{ id: "care", text: careTitle }] : []),
+];
 
 const schema = [
   webPage(url, d.seoTitle, d.description, "MedicalWebPage"),
@@ -42,31 +49,80 @@ const schema = [
           <li aria-current="page">{d.title}</li>
         </ol>
       </nav>
-      <div class="page-hero__grid">
+      <div class:list={["page-hero__grid", { "page-hero__grid--solo": !d.photo }]}>
         <div>
-          <span class="eyebrow reveal">{d.short}</span>
+          {!d.tagline && <span class="eyebrow reveal">{d.short}</span>}
           <h1 class="reveal" style="--d:.06s">{d.title}</h1>
+          {d.tagline && <p class="page-hero__tag reveal" style="--d:.09s">{d.tagline}</p>}
           <p class="lead reveal" style="--d:.12s">{d.lead}</p>
           <div class="btn-row reveal" style="--d:.18s">
             <a class="btn btn--primary" href={link("/booking/")}><Icon name="calendar" />رزرو نوبت مشاوره</a>
             <a class="btn btn--ghost" href={telHref}><Icon name="phone" /><bdi>{faPhone(site.phone)}</bdi></a>
           </div>
         </div>
-        <div class="page-hero__media page-hero__media--poster reveal" style="--d:.1s">
-          <Photo name={d.photo} alt={d.photoAlt} label={d.photoAlt} eager sizes="(max-width: 899px) 80vw, 400px" />
-        </div>
+        {d.photo && (
+          <div class="page-hero__media page-hero__media--poster reveal" style="--d:.1s">
+            <Photo name={d.photo} alt={d.photoAlt} label={d.photoAlt} eager sizes="(max-width: 899px) 80vw, 400px" />
+          </div>
+        )}
       </div>
     </div>
   </section>
 
-  {/* What it covers */}
-  <section class="section section--tight" aria-labelledby="items-title">
-    <div class="container">
-      <header class="section-head reveal">
-        <span class="eyebrow">{d.title}</span>
-        <h2 id="items-title" class="h2">{d.itemsTitle}</h2>
-      </header>
-      {d.items.length ? (
+  {/* Article: the doctor's text, then the decision notes and care cards */}
+  <section class="section section--tight">
+    <div class:list={["container", "article", { "article--toc": toc.length > 2 }]}>
+      {toc.length > 2 && (
+        <nav class="toc" aria-label="فهرست مطالب">
+          <span class="toc__title">در این صفحه</span>
+          <ol>{toc.map((t) => <li><a href={`#${t.id}`}>{t.text}</a></li>)}</ol>
+        </nav>
+      )}
+      <div class="article__main">
+        <div class="prose reveal"><Content /></div>
+
+        {d.considerations.length > 0 && (
+          <section id="considerations" class="article__block" aria-labelledby="considerations-title">
+            <h2 id="considerations-title">نکات مهم قبل از تصمیم‌گیری</h2>
+            <ul class="notes-grid">
+              {d.considerations.map((c) => (
+                <li class="note-card reveal">
+                  <span class="svc__ic"><Icon name={c.icon as any} /></span>
+                  <div>
+                    <h3>{c.title}</h3>
+                    <p>{c.text}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {d.care.length > 0 && (
+          <section id="care" class="article__block" aria-labelledby="care-title">
+            <h2 id="care-title">{careTitle}</h2>
+            <div class:list={["care-grid", { "care-grid--one": d.care.length === 1 }]}>
+              {d.care.map((g, i) => (
+                <div class:list={["care-card reveal", { "care-card--after": i > 0 || d.care.length === 1 }]}>
+                  <h3><Icon name={i > 0 || d.care.length === 1 ? "check" : "clock"} />{g.title}</h3>
+                  <ul>{g.items.map((x) => <li>{x}</li>)}</ul>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+    </div>
+  </section>
+
+  {/* Older structured blocks (used by services that don't have a full article yet) */}
+  {d.items.length > 0 && (
+    <section class="section section--tight" aria-labelledby="items-title">
+      <div class="container">
+        <header class="section-head reveal">
+          <span class="eyebrow">{d.title}</span>
+          <h2 id="items-title" class="h2">{d.itemsTitle}</h2>
+        </header>
         <ul class="items">
           {d.items.map((it, i) => (
             <li class="item reveal" id={it.id} style={`--d:${i * 0.07}s`}>
@@ -76,53 +132,47 @@ const schema = [
             </li>
           ))}
         </ul>
-      ) : (
-        <p class="muted reveal">
-          روش درمان پس از معاینه و بر اساس علت و شدت ریزش، برای شما انتخاب می‌شود. <Slot label="فهرست روش‌های درمان" />
-        </p>
-      )}
-    </div>
-  </section>
-
-  {/* Body + suitable for */}
-  <section class="section section--tight">
-    <div class="container split">
-      <div class="prose reveal">
-        <span class="eyebrow">رویکرد درمان</span>
-        <h2 class="h3" style="margin:10px 0 18px">چطور انجام می‌شود؟</h2>
-        <Content />
       </div>
-      <div class="reveal" style="--d:.08s">
-        <span class="eyebrow">مناسب برای</span>
-        <h2 class="h3" style="margin-top:10px">چه کسانی مراجعه می‌کنند؟</h2>
-        <ul class="checklist">
-          {d.suitable.map((x) => <li><Icon name="check" />{x}</li>)}
-        </ul>
-        <p class="disclaimer" style="margin-top:22px">مناسب بودن هر درمان برای شما فقط پس از معاینه‌ی پزشک مشخص می‌شود.</p>
+    </section>
+  )}
+
+  {d.suitable.length > 0 && (
+    <section class="section section--tight">
+      <div class="container split">
+        <div class="reveal">
+          <span class="eyebrow">مناسب برای</span>
+          <h2 class="h3" style="margin-top:10px">چه کسانی مراجعه می‌کنند؟</h2>
+        </div>
+        <div class="reveal" style="--d:.08s">
+          <ul class="checklist" style="margin-top:0">
+            {d.suitable.map((x) => <li><Icon name="check" />{x}</li>)}
+          </ul>
+          <p class="disclaimer" style="margin-top:22px">مناسب بودن هر درمان برای شما فقط پس از معاینه‌ی پزشک مشخص می‌شود.</p>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+  )}
 
-  {/* Steps */}
-  <section class="section section--tight" aria-labelledby="steps-title">
-    <div class="container">
-      <header class="section-head reveal">
-        <span class="eyebrow">مراحل</span>
-        <h2 id="steps-title" class="h2">مسیر درمان</h2>
-      </header>
-      <ol class="steps">
-        {d.steps.map((s, i) => (
-          <li class="step reveal" style={`--d:${i * 0.08}s`}>
-            <span class="step__n">{fa(i + 1)}</span>
-            <h3>{s.title}</h3>
-            <p>{s.text}</p>
-          </li>
-        ))}
-      </ol>
-    </div>
-  </section>
+  {d.steps.length > 0 && (
+    <section class="section section--tight" aria-labelledby="steps-title">
+      <div class="container">
+        <header class="section-head reveal">
+          <span class="eyebrow">مراحل</span>
+          <h2 id="steps-title" class="h2">مسیر درمان</h2>
+        </header>
+        <ol class="steps">
+          {d.steps.map((s, i) => (
+            <li class="step reveal" style={`--d:${i * 0.08}s`}>
+              <span class="step__n">{fa(i + 1)}</span>
+              <h3>{s.title}</h3>
+              <p>{s.text}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  )}
 
-  {/* FAQ */}
   {d.faq.length > 0 && (
     <section class="section section--tight" aria-labelledby="faq-title">
       <div class="container split">
