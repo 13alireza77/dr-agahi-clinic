@@ -17,8 +17,9 @@ export const baleHref = site.bale ? `https://ble.ir/${site.bale}` : "";
 
 const { lat, lng } = site.geo;
 export const mapLinks = {
-  // Neshan's web map has no pin-by-coordinates URL, so this is a share link (nshn.ir/…) copied from the Neshan app.
-  neshan: site.neshanUrl,
+  // A share link (nshn.ir/…) from the Neshan app pins the building; until there is one, a coordinate search
+  // opens Neshan on the clinic's street (its @lat,lng URLs ignore the position and show all of Tehran).
+  neshan: site.neshanUrl || `https://neshan.org/maps/search/${lat},${lng}`,
   balad: `https://balad.ir/location?latitude=${lat}&longitude=${lng}&zoom=17`,
   google: `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`,
 };

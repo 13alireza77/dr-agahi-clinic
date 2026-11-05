@@ -1,45 +1,67 @@
 ---
-// Lightweight, schematic location card (no third-party map scripts). Links open Neshan / Balad / Google Maps.
+// Location card: a Neshan map image of the clinic that opens Neshan when tapped. With a Neshan web key in
+// site.json, a live Neshan map loads over it once the card scrolls into view. Links open Neshan / Balad / Google Maps.
+// The image is src/assets/map/neshan.png, saved from Neshan's static map API (see README), so no key ships with the site.
+import { Image } from "astro:assets";
 import { site, mapLinks } from "../lib/site";
+import neshanMap from "../assets/map/neshan.png";
 import Slot from "./Slot.astro";
+const key = site.neshanMapKey;
 ---
 <div class="map-card">
-  <svg class="map-card__art" viewBox="0 0 480 330" role="img" aria-label="نقشه‌ی شماتیک: مطب روبه‌روی متروی قلهک">
-    <rect width="480" height="330" fill="#efe4d4" />
-    <g fill="#e6d6c1">
-      <rect x="18" y="20" width="150" height="96" rx="10" /><rect x="18" y="140" width="150" height="70" rx="10" />
-      <rect x="18" y="234" width="150" height="80" rx="10" /><rect x="262" y="20" width="96" height="120" rx="10" />
-      <rect x="378" y="20" width="86" height="120" rx="10" /><rect x="262" y="198" width="202" height="116" rx="10" />
-    </g>
-    <g stroke="#fbf7f2" stroke-linecap="round" fill="none">
-      <path d="M215 -10 V340" stroke-width="30" />
-      <path d="M-10 128 H200 M230 168 H490" stroke-width="14" />
-      <path d="M368 0 V150" stroke-width="10" />
-    </g>
-    <path d="M215 -10 V340" stroke="#d8c4ab" stroke-width="1.5" stroke-dasharray="10 10" />
-    <!-- metro -->
-    <g transform="translate(150 66)">
-      <circle r="17" fill="#6e4636" />
-      <text y="6" text-anchor="middle" font-family="Marcellus, serif" font-size="17" fill="#fbf7f2">M</text>
-      <text x="0" y="40" text-anchor="middle" font-size="13" font-weight="600" fill="#5b3326" direction="rtl">متروی قلهک</text>
-    </g>
-    <!-- clinic -->
-    <g transform="translate(300 116)">
-      <circle r="30" fill="#6e4636" opacity=".12"><animate attributeName="r" values="18;34;18" dur="3s" repeatCount="indefinite" /><animate attributeName="opacity" values=".25;0;.25" dur="3s" repeatCount="indefinite" /></circle>
-      <path d="M0 8s-15-13-15-25a15 15 0 0 1 30 0C15-5 0 8 0 8Z" fill="#3a1a08" transform="translate(0 -6)" />
-      <circle cy="-23" r="5.5" fill="#fbf7f2" />
-      <rect x="-56" y="12" width="112" height="28" rx="14" fill="#fbf7f2" />
-      <text y="31" text-anchor="middle" font-size="12.5" font-weight="700" fill="#3a1a08" direction="rtl">ساختمان پزشکان آرامش</text>
-    </g>
-    <text x="466" y="318" text-anchor="start" font-size="10" fill="#9b7c62" direction="rtl">نقشه‌ی شماتیک</text>
-  </svg>
+  {key && <div class="map-card__live" data-key={key} data-lat={site.geo.lat} data-lng={site.geo.lng} aria-label="نقشه‌ی نشان: محل مطب" role="region"></div>}
+  <a class="map-card__art" href={mapLinks.neshan} target="_blank" rel="noopener" aria-label="باز کردن محل مطب در نشان">
+    {/* Shown at its natural size and cropped around the pin, so street names stay readable at any card width */}
+    <Image src={neshanMap} alt="نقشه‌ی نشان: محل مطب در خیابان کدویی، نزدیک خیابان شریعتی و متروی قلهک" format="webp" quality={85} />
+    <span class="map-card__credit">© Neshan © OSM</span>
+  </a>
   <div class="map-card__foot">
     <p>{site.building}</p>
     <div class="map-links">
-      {mapLinks.neshan && <a href={mapLinks.neshan} target="_blank" rel="noopener">نشان</a>}
+      <a class="is-main" href={mapLinks.neshan} target="_blank" rel="noopener">مسیریابی با نشان</a>
       <a href={mapLinks.balad} target="_blank" rel="noopener">بلد</a>
       <a href={mapLinks.google} target="_blank" rel="noopener">گوگل‌مپ</a>
     </div>
-    {!mapLinks.neshan && <p style="margin:10px 0 0"><Slot label="لینک اشتراک نشان (nshn.ir)" /></p>}
+    {!site.neshanUrl && <p style="margin:10px 0 0"><Slot label="لینک اشتراک نشان (nshn.ir)" /></p>}
   </div>
 </div>
+
+{key && (
+  <script is:inline>
+    (() => {
+      const el = document.querySelector(".map-card__live");
+      if (!el || !("IntersectionObserver" in window)) return;
+      const sdk = "https://static.neshan.org/sdk/leaflet/v1.9.4/neshan-sdk/v1.0.8/index";
+      const start = () => {
+        const css = document.createElement("link");
+        css.rel = "stylesheet"; css.href = sdk + ".css";
+        document.head.append(css);
+        const js = document.createElement("script");
+        js.src = sdk + ".js";
+        js.onload = () => {
+          const at = [+el.dataset.lat, +el.dataset.lng];
+          // One-finger drag stays page scroll on phones; the map pans with two fingers or the zoom buttons
+          const map = new L.Map(el, {
+            key: el.dataset.key, maptype: "neshan", poi: true, traffic: false,
+            center: at, zoom: 16, scrollWheelZoom: false, dragging: !L.Browser.mobile,
+          });
+          L.marker(at).addTo(map).bindPopup("ساختمان پزشکان آرامش").openPopup();
+          // Show the map once real tiles arrive. With a wrong key or an unlisted domain, Neshan loads a few real
+          // tiles, then clears the map and swaps in blank "tile-empty" images: hide it again and keep the drawing.
+          let failed = false;
+          const watch = (layer) => layer.on && layer.on("tileload", (t) => {
+            if (((t.tile && t.tile.src) || "").includes("tile-empty")) failed = true;
+            el.classList.toggle("is-ready", !failed);
+          });
+          map.eachLayer(watch);
+          map.on("layeradd", (e) => watch(e.layer));
+        };
+        document.head.append(js);
+      };
+      const io = new IntersectionObserver((es) => {
+        if (es.some((e) => e.isIntersecting)) { io.disconnect(); start(); }
+      }, { rootMargin: "300px" });
+      io.observe(el);
+    })();
+  </script>
+)}

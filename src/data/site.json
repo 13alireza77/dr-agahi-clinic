@@ -4,6 +4,7 @@
   "doctor": "دکتر صدف آگاهی",
   "doctorPlain": "صدف آگاهی",
   "wordmark": "AESTHETIC CLINIC",
+  "palette": "green",
   "tagline": "خدمات تخصصی زیبایی پوست و مو",
   "locality": "قلهک، تهران",
 
@@ -31,7 +32,8 @@
   "addressStreet": "روبه‌روی متروی قلهک، خیابان شهید کدویی، روبه‌روی کوچه شکوفه، ساختمان پزشکان آرامش، پلاک ۸، واحد ۸",
   "building": "ساختمان پزشکان آرامش، پلاک ۸، واحد ۸",
   "geo": { "lat": 35.77243540076, "lng": 51.437315046787 },
-  "neshanUrl": "",
+  "neshanUrl": "https://nshn.ir/QbvsB4Gxu_Ho",
+  "neshanMapKey": "",
 
   "visitNotes": [
     "لطفاً بعد از ورود به مطب کاور کفش بپوشید.",
