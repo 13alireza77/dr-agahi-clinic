@@ -7,6 +7,7 @@ import ContactPanel from "../components/ContactPanel.astro";
 import ServiceList from "../components/ServiceList.astro";
 import Credentials from "../components/Credentials.astro";
 import VisitNotes from "../components/VisitNotes.astro";
+import ClinicVideo from "../components/ClinicVideo.astro";
 import { site, fa, faPhone, telHref, link } from "../lib/site";
 import { webPage } from "../lib/schema";
 
@@ -47,7 +48,7 @@ const steps = [
 
       <div class="hero__media reveal" style="--d:.12s">
         <span class="hero__ring" aria-hidden="true"></span>
-        <Photo name="doctor" shape="arch" eager alt={`پرتره‌ی ${site.doctor}`} label="پرتره‌ی دکتر آگاهی" sizes="(max-width: 900px) 78vw, 460px" />
+        <Photo name="doctor-portrait" shape="arch" eager alt={`${site.doctor} در پذیرش مطب`} label="دکتر آگاهی در مطب" sizes="(max-width: 900px) 78vw, 460px" />
         <div class="hero__card">
           <strong>{site.credentials[0]}</strong>
           {site.credentials[1]}
@@ -91,7 +92,7 @@ const steps = [
   <section class="section" aria-labelledby="about-title">
     <div class="container about">
       <div class="about__media reveal">
-        <Photo name="clinic" shape="arch" alt="فضای مطب دکتر صدف آگاهی" label="فضای مطب" sizes="(max-width: 900px) 72vw, 400px" />
+        <ClinicVideo label="ویدیوی کوتاه از اتاق درمان مطب دکتر صدف آگاهی" />
       </div>
       <div class="reveal" style="--d:.1s">
         <span class="eyebrow">درباره‌ی دکتر</span>

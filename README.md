@@ -26,7 +26,7 @@ npm run preview   # serve dist/ locally
 - `logo` — put the file in `public/` (e.g. `public/logo.svg`) and set `"logo": "/logo.svg"`.
 - `landline` — digits only, e.g. `"02122223333"`.
 - `instagram` — handle without `@`.
-- `bale` — the clinic's Bale ID without `@` (the booking page links to `https://ble.ir/<id>`; Bale has no link-by-phone-number). Until it is set, the Bale option shows «به‌زودی».
+- `bale` — the clinic's mobile number on Bale (`09…`, shown on the card) or a Bale ID without `@`; either way the booking page links to `https://ble.ir/<value>`. Until it is set, the Bale option shows «به‌زودی».
 - `neshanUrl` — a share link (`nshn.ir/…`) from the Neshan app with the building pinned. Until it is set, «مسیریابی با نشان» opens Neshan on the clinic's street.
 - `neshanMapKey` — optional: a **web** map key (`web.…`, not a `service.…` key) from platform.neshan.org, with the site's domain added to the key. With it, a live Neshan map loads over the map image; with a wrong key or domain, the image stays.
 - The map image is `src/assets/map/neshan.png`, saved once from Neshan's static map API with the clinic's service key. To redo it (e.g. after a move), keep the key out of the repo and run:
@@ -42,13 +42,14 @@ npm run preview   # serve dist/ locally
 
 ### Photos
 
-Drop images into `src/assets/photos/` with these names (jpg/png/webp, at least 1600px on the long side). They replace the placeholders automatically and are converted to AVIF/WebP at build time.
+Drop images into `src/assets/photos/` with these names (jpg/png/webp, at least 1600px on the long side). They replace the placeholders automatically and are converted to WebP at build time.
 
 | Name | Used for |
 |---|---|
-| `doctor` | Hero + About portrait (portrait orientation, ~4:5) |
-| `clinic` | Clinic interior, home "About" section |
+| `doctor-portrait` | The doctor's photo: home hero (shown in a tall arch, so keep her near the middle) and About page |
 | `<service-id>` | Service poster, 9:16 (e.g. `acne.webp` for `src/content/services/acne.md`). The file name is the `photo:` field of the service. |
+
+The home "About" section shows a short silent loop of the treatment room: `public/media/clinic.mp4` (H.264, 720×1280, no sound, ~1.6 MB) with `clinic-poster.jpg` as its first frame. Phone clips are often HEVC, which many Android browsers can't play, so re-encode a new clip to H.264 before swapping it in.
 
 Current posters: `acne`, `botox`, `moles`, `facial`, `hair-loss`, `rejuvenation`. To add a service, copy one `.md` file, change `order`, `title`, `photo` and the text, and add its poster.
 

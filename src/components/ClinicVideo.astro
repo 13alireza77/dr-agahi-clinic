@@ -1,0 +1,27 @@
+---
+// Short silent loop of the treatment room, in the same arch frame as the photos.
+// public/media/clinic.mp4 is H.264 720x1280 without sound (re-encoded from the phone's HEVC clip, which many
+// Android browsers can't play). It loads and plays only while on screen; with reduced motion it stays on the poster.
+import { link } from "../lib/site";
+interface Props { label: string; }
+const { label } = Astro.props;
+---
+<div class="frame frame--arch frame--video">
+  <video
+    class="clinic-video"
+    src={link("/media/clinic.mp4")}
+    poster={link("/media/clinic-poster.jpg")}
+    muted loop playsinline preload="none"
+    aria-label={label}
+  ></video>
+</div>
+
+<script is:inline>
+  (() => {
+    const v = document.querySelector(".clinic-video");
+    if (!v || matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) return;
+    new IntersectionObserver((es) => {
+      for (const e of es) e.isIntersecting ? v.play().catch(() => {}) : v.pause();
+    }, { threshold: 0.25 }).observe(v);
+  })();
+</script>

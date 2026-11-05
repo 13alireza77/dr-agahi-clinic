@@ -8,10 +8,12 @@ import Slot from "./Slot.astro";
 interface Props { variant?: "cards" | "compact"; }
 const { variant = "cards" } = Astro.props;
 
+// `bale` in site.json is either a mobile number (ble.ir/09…) or a Bale ID; a number is shown on the card
+const baleIsNumber = /^0\d{10}$/.test(site.bale);
 const options = [
-  { icon: "chat", title: "پیام در بله", text: "سؤال یا درخواست نوبت را در بله بفرستید.", href: baleHref, external: true, pending: !baleHref },
-  { icon: "phone", title: "تماس تلفنی", text: faPhone(site.phone), href: telHref, external: false, ltr: true },
-  { icon: "calendar", title: "پذیرش۲۴", text: "زمان‌های خالی را ببینید و آنلاین نوبت بگیرید.", href: site.bookingUrl, external: true },
+  { icon: "chat", title: "پیام در بله", text: baleIsNumber ? faPhone(site.bale) : "سؤال یا درخواست نوبت را در بله بفرستید.", href: baleHref, external: true, ltr: baleIsNumber, pending: !baleHref },
+  { icon: "phone", title: "تماس تلفنی", text: faPhone(site.phone), href: telHref, external: false, ltr: true, pending: false },
+  { icon: "calendar", title: "پذیرش۲۴", text: "زمان‌های خالی را ببینید و آنلاین نوبت بگیرید.", href: site.bookingUrl, external: true, ltr: false, pending: false },
 ] as const;
 ---
 <ul class:list={["book-opts", `book-opts--${variant}`]}>
@@ -20,7 +22,7 @@ const options = [
     return (
       <li class="reveal" style={`--d:${i * 0.07}s`}>
         <Tag
-          class:list={["book-opt", { "is-pending": "pending" in o && o.pending }]}
+          class:list={["book-opt", { "is-pending": o.pending }]}
           href={o.href || undefined}
           target={o.href && o.external ? "_blank" : undefined}
           rel={o.href && o.external ? "noopener" : undefined}
@@ -29,8 +31,8 @@ const options = [
           <span class="book-opt__body">
             <strong>{o.title}</strong>
             {variant === "cards" && (
-              "ltr" in o ? <span class="book-opt__text"><bdi>{o.text}</bdi></span>
-              : "pending" in o && o.pending ? <span class="book-opt__text">به‌زودی <Slot label="شناسه‌ی بله (site.json → bale)" /></span>
+              o.pending ? <span class="book-opt__text">به‌زودی <Slot label="شماره یا شناسه‌ی بله (site.json → bale)" /></span>
+              : o.ltr ? <span class="book-opt__text"><bdi>{o.text}</bdi></span>
               : <span class="book-opt__text">{o.text}</span>
             )}
           </span>

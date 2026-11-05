@@ -1,58 +1,96 @@
 ---
-// Procedurally drawn palm fronds, blurred in CSS to read as soft window shadows.
+// Procedurally drawn palm fronds, cast like a sunlit window shadow on the wall.
+// Leaflets are thin tapered blades that droop under their own weight. The shadow is crisp where the leaves
+// would be close to the wall (the middle of the fronds) and soft where they are far (the base and edges):
+// two blurred copies blended with a mask, the same penumbra a real shadow has.
 interface Props { class?: string; seed?: number; }
 const { class: className = "", seed = 7 } = Astro.props;
 
 let s = seed;
 const rand = () => ((s = (s * 16807) % 2147483647) / 2147483647);
+const jit = (n: number) => (rand() - 0.5) * 2 * n;
 
 type P = [number, number];
-const bez = (a: P, c: P, b: P, t: number): P => [
-  (1 - t) ** 2 * a[0] + 2 * (1 - t) * t * c[0] + t ** 2 * b[0],
-  (1 - t) ** 2 * a[1] + 2 * (1 - t) * t * c[1] + t ** 2 * b[1],
-];
-const tan = (a: P, c: P, b: P, t: number): P => [
-  2 * (1 - t) * (c[0] - a[0]) + 2 * t * (b[0] - c[0]),
-  2 * (1 - t) * (c[1] - a[1]) + 2 * t * (b[1] - c[1]),
-];
+const add = (a: P, b: P): P => [a[0] + b[0], a[1] + b[1]];
+const sub = (a: P, b: P): P => [a[0] - b[0], a[1] - b[1]];
+const mul = (a: P, k: number): P => [a[0] * k, a[1] * k];
+const unit = (a: P): P => { const l = Math.hypot(a[0], a[1]) || 1; return [a[0] / l, a[1] / l]; };
+const perp = (a: P): P => [-a[1], a[0]];
+const bez = (a: P, c: P, b: P, t: number): P => add(add(mul(a, (1 - t) ** 2), mul(c, 2 * (1 - t) * t)), mul(b, t * t));
+const tan = (a: P, c: P, b: P, t: number): P => add(mul(sub(c, a), 2 * (1 - t)), mul(sub(b, c), 2 * t));
 const f = (n: number) => n.toFixed(1);
+const pt = (p: P) => `${f(p[0])} ${f(p[1])}`;
 
-function frond(base: P, angle: number, length: number, bend: number, leaflets: number) {
+// One leaflet: a narrow blade from the rachis, widest at a third of its length, its tip pulled down by gravity
+function blade(p: P, angle: number, len: number, width: number, droop: number) {
   const dir: P = [Math.cos(angle), Math.sin(angle)];
-  const nrm: P = [-dir[1], dir[0]];
-  const tip: P = [base[0] + dir[0] * length, base[1] + dir[1] * length];
-  const ctrl: P = [base[0] + dir[0] * length * 0.5 + nrm[0] * bend, base[1] + dir[1] * length * 0.5 + nrm[1] * bend];
+  const tip: P = add(add(p, mul(dir, len)), [0, len * droop]);
+  const ctrl: P = add(add(p, mul(dir, len * 0.55)), [0, len * droop * 0.08]);
+  const q1 = add(p, mul(sub(ctrl, p), 2 / 3));
+  const q2 = add(tip, mul(sub(ctrl, tip), 2 / 3));
+  const n = perp(unit(sub(tip, p)));
+  return `M${pt(p)}C${pt(add(q1, mul(n, width)))} ${pt(add(q2, mul(n, width * 0.3)))} ${pt(tip)}` +
+    `C${pt(sub(q2, mul(n, width * 0.3)))} ${pt(sub(q1, mul(n, width)))} ${pt(p)}Z`;
+}
+
+function frond(base: P, angle: number, length: number, bend: number, pairs: number) {
+  const dir: P = [Math.cos(angle), Math.sin(angle)];
+  const tip: P = add(add(base, mul(dir, length)), [0, length * 0.12]);
+  const ctrl: P = add(add(add(base, mul(dir, length * 0.5)), mul(perp(dir), bend)), [0, length * 0.1]);
   const out: string[] = [];
-  out.push(`M${f(base[0])} ${f(base[1])}Q${f(ctrl[0])} ${f(ctrl[1])} ${f(tip[0])} ${f(tip[1])}`);
-  for (let i = 1; i <= leaflets; i++) {
-    const t = 0.08 + (i / leaflets) * 0.9;
+
+  // Rachis: tapered from 9 units at the base to a hairline at the tip
+  const left: P[] = [], right: P[] = [];
+  for (let i = 0; i <= 24; i++) {
+    const t = i / 24;
     const p = bez(base, ctrl, tip, t);
-    const d = tan(base, ctrl, tip, t);
-    const dl = Math.hypot(d[0], d[1]);
-    const ux = d[0] / dl, uy = d[1] / dl;
+    const n = perp(unit(tan(base, ctrl, tip, t)));
+    const w = 4.5 * (1 - t) + 0.4;
+    left.push(add(p, mul(n, w)));
+    right.unshift(sub(p, mul(n, w)));
+  }
+  out.push(`M${[...left, ...right].map(pt).join("L")}Z`);
+
+  const maxLen = length * 0.34;
+  for (let i = 0; i < pairs; i++) {
+    const t = 0.05 + (i / (pairs - 1)) * 0.93 + jit(0.006);
+    const p = bez(base, ctrl, tip, t);
+    const along = Math.atan2(...(tan(base, ctrl, tip, t).reverse() as P));
+    // Longest leaflets a little before the middle of the frond, short ones at the base and tip
+    const profile = Math.sin(Math.PI * Math.min(1, t ** 0.75 * 1.02)) ** 0.8;
     for (const side of [1, -1]) {
-      const spread = (0.95 + rand() * 0.25) * side;
-      const len = length * (0.42 - t * 0.3) * (0.85 + rand() * 0.3);
-      const a = Math.atan2(uy, ux) + spread + 0.25 * side * t;
-      const droop = 0.22 * side;
-      const q: P = [p[0] + Math.cos(a + droop) * len, p[1] + Math.sin(a + droop) * len];
-      const m: P = [p[0] + Math.cos(a) * len * 0.5, p[1] + Math.sin(a) * len * 0.5];
-      const w = len * 0.085;
-      const nx = -Math.sin(a), ny = Math.cos(a);
-      out.push(
-        `M${f(p[0])} ${f(p[1])}Q${f(m[0] + nx * w)} ${f(m[1] + ny * w)} ${f(q[0])} ${f(q[1])}Q${f(m[0] - nx * w)} ${f(m[1] - ny * w)} ${f(p[0])} ${f(p[1])}Z`,
-      );
+      if (rand() < 0.05) continue; // a torn or missing leaflet
+      const len = maxLen * (0.18 + 0.82 * profile) * (0.86 + rand() * 0.28);
+      const twisted = rand() < 0.14; // seen edge-on, so it casts a thinner shadow
+      const width = Math.min(15, len * 0.075) * (twisted ? 0.45 : 1) * (0.85 + rand() * 0.3);
+      const a = along + side * (0.62 + jit(0.12) + t * 0.22);
+      out.push(blade(p, a, len, width, 0.28 + rand() * 0.22 + t * 0.15));
     }
   }
   return out.join("");
 }
 
-const d = [
-  frond([980, -40], 2.25, 760, -120, 26),
-  frond([1000, 60], 2.75, 680, 90, 24),
-  frond([930, -80], 1.85, 620, 110, 22),
-].join("");
+const fronds: [P, number, number, number, number][] = [
+  // The crown sits off the top corner, so only the fronds reach into view
+  [[1130, -100], 2.30, 980, -60, 40],
+  [[1150, 60], 2.90, 820, 80, 36],
+  [[1060, -160], 1.86, 700, 90, 32],
+];
+const d = fronds.map(([b, a, l, bend, n]) => frond(b, a + jit(0.07), l * (0.94 + rand() * 0.12), bend, n)).join("");
+const id = `palm-${seed}-${Math.floor(rand() * 1e6)}`;
 ---
 <svg class={`palm ${className}`} viewBox="0 0 1000 900" aria-hidden="true" focusable="false">
-  <path d={d} fill="currentColor" stroke="currentColor" stroke-width="6" stroke-linejoin="round" />
+  <defs>
+    <path id={`${id}-d`} d={d} />
+    <filter id={`${id}-soft`} x="-15%" y="-15%" width="130%" height="130%"><feGaussianBlur stdDeviation="9" /></filter>
+    <filter id={`${id}-crisp`} x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="1.4" /></filter>
+    <radialGradient id={`${id}-g`} cx="52%" cy="58%" r="52%">
+      <stop offset="0" stop-color="#fff" />
+      <stop offset="0.55" stop-color="#fff" stop-opacity="0.75" />
+      <stop offset="1" stop-color="#fff" stop-opacity="0" />
+    </radialGradient>
+    <mask id={`${id}-near`}><rect width="1000" height="900" fill={`url(#${id}-g)`} /></mask>
+  </defs>
+  <use href={`#${id}-d`} fill="currentColor" filter={`url(#${id}-soft)`} />
+  <use href={`#${id}-d`} fill="currentColor" filter={`url(#${id}-crisp)`} mask={`url(#${id}-near)`} />
 </svg>

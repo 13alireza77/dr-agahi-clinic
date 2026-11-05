@@ -57,8 +57,8 @@
 [data-palette="green"] .nav a[aria-current="page"]::after { background: var(--panel-1); height: 2px; }
 [data-palette="green"] .toc { border-inline-start-color: var(--line); }
 [data-palette="green"] :is(.hero, .page-hero) {
-  background: radial-gradient(60% 70% at 85% 10%, rgb(143 168 135 / 0.22), transparent 70%),
-              radial-gradient(45% 60% at 10% 90%, rgb(143 168 135 / 0.16), transparent 70%);
+  /* a sage glow from the top corner that fades out well before the section ends */
+  background: radial-gradient(65% 55% at 85% 0%, rgb(143 168 135 / 0.2), transparent 100%);
 }
 :root[data-palette="green"] :is(.hero__sub, .page-hero__tag, .hero__latin) { color: var(--leaf); }
 [data-palette="green"] .hero__ring { border-color: var(--line); opacity: 0.8; }
@@ -294,8 +294,13 @@ bdi, .ltr { unicode-bidi: isolate; direction: ltr; }
    ========================================================================== */
 .palm {
   position: absolute; pointer-events: none; z-index: 0; color: var(--ink);
-  opacity: 0.11; filter: blur(5px);
-  transform-origin: 85% 0%;
+  opacity: 0.11; max-width: none;
+  transform-origin: 85% 0%; will-change: transform;
+  /* fade the drawing's edges so the shadow never ends in a straight line */
+  -webkit-mask-image: linear-gradient(to left, transparent, #000 16%), linear-gradient(to bottom, transparent, #000 12%), linear-gradient(to top, transparent, #000 10%);
+  -webkit-mask-composite: source-in, source-in;
+          mask-image: linear-gradient(to left, transparent, #000 16%), linear-gradient(to bottom, transparent, #000 12%), linear-gradient(to top, transparent, #000 10%);
+          mask-composite: intersect;
   animation: palm-sway 18s ease-in-out infinite alternate;
 }
 .palm--light { color: #000; opacity: 0.16; mix-blend-mode: multiply; }
@@ -316,6 +321,8 @@ bdi, .ltr { unicode-bidi: isolate; direction: ltr; }
 .frame--arch { border-radius: 999px 999px var(--radius) var(--radius); }
 .frame--circle { border-radius: 50%; }
 .frame img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease); }
+.frame video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.about__media .frame.frame--video { aspect-ratio: 4 / 5.6; }
 a:hover .frame img, .frame:hover img { transform: scale(1.04); }
 .placeholder {
   width: 100%; height: 100%;
@@ -337,8 +344,9 @@ a:hover .frame img, .frame:hover img { transform: scale(1.04); }
 /* ==========================================================================
    Hero
    ========================================================================== */
-.hero { position: relative; overflow: clip; padding-block: clamp(28px, 6vw, 88px) clamp(56px, 8vw, 120px); }
-.hero .palm { width: min(980px, 140vw); top: -120px; inset-inline-start: -180px; }
+.hero { position: relative; overflow-x: clip; overflow-y: visible; padding-block: clamp(28px, 6vw, 88px) clamp(56px, 8vw, 120px); }
+.hero .palm { width: min(1040px, 140vw); top: -70px; inset-inline-start: -200px; opacity: 0.14; }
+@media (max-width: 699px) { .hero .palm { width: 150vw; top: -30px; inset-inline-start: -30vw; } }
 .hero__grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1.08fr 0.92fr; gap: clamp(32px, 6vw, 96px); align-items: center; }
 .hero__latin { font-size: clamp(0.72rem, 0.4vw + 0.62rem, 0.88rem); color: var(--muted); display: block; margin-bottom: 18px; }
 .hero h1 { margin-top: 14px; }
@@ -365,7 +373,7 @@ a:hover .frame img, .frame:hover img { transform: scale(1.04); }
   transform: translate(-26px, 26px);
 }
 .hero__card {
-  position: absolute; inset-inline-start: -44px; bottom: 44px; z-index: 2;
+  position: absolute; inset-inline-start: -44px; bottom: -22px; z-index: 2;
   background: rgb(251 247 242 / 0.88); backdrop-filter: blur(10px);
   border-radius: var(--radius-sm); padding: 16px 20px; box-shadow: var(--shadow-soft);
   font-size: 0.86rem; line-height: 1.8; max-width: 250px;
@@ -374,14 +382,14 @@ a:hover .frame img, .frame:hover img { transform: scale(1.04); }
 
 @media (max-width: 899px) {
   .hero__grid { grid-template-columns: 1fr; }
-  .hero__media { width: min(76%, 330px); margin-top: 12px; }
+  .hero__media { width: min(76%, 330px); margin-top: 12px; margin-bottom: 36px; }
   .hero__latin { display: none; }
   .hero__text { text-align: center; }
   .hero .eyebrow { justify-content: center; }
   .hero .eyebrow::after { content: ""; width: 32px; height: 1px; background: var(--line); }
   .hero .lead { margin-inline: auto; }
   .hero .btn-row, .trust { justify-content: center; }
-  .hero__card { inset-inline-start: -28px; bottom: 26px; padding: 12px 16px; max-width: 210px; font-size: 0.8rem; }
+  .hero__card { inset-inline-start: -28px; bottom: -34px; padding: 12px 16px; max-width: 210px; font-size: 0.8rem; }
   .hero__ring { transform: translate(-14px, 14px); }
 }
 @media (max-width: 480px) {
@@ -402,6 +410,12 @@ a:hover .frame img, .frame:hover img { transform: scale(1.04); }
 .svc:nth-child(even) .svc__media { order: 2; }
 .svc__media { position: relative; }
 .svc__media .frame { aspect-ratio: 941 / 1672; border-radius: 26px; }
+.svc__poster { display: block; border-radius: 26px; transition: transform 0.5s var(--ease); }
+.svc__poster:hover { transform: translateY(-4px); }
+.svc__title { display: inline-flex; align-items: center; gap: 12px; color: inherit; text-decoration: none; }
+.svc__title svg { width: 0.6em; height: 0.6em; flex: none; color: var(--panel-1); transition: transform 0.3s var(--ease); }
+.svc__title:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.3em; text-decoration-color: var(--line); }
+.svc__title:hover svg, .svc:has(.svc__poster:hover) .svc__title svg { transform: translateX(-5px); }
 .svc__num {
   position: absolute; top: -0.5em; inset-inline-end: -0.2em; z-index: 2;
   font-size: clamp(3rem, 4.6vw, 4.6rem); line-height: 1; font-weight: 300; color: var(--ink);
@@ -523,7 +537,7 @@ a:hover .frame img, .frame:hover img { transform: scale(1.04); }
 .panel h2, .panel h3, .panel strong { color: var(--on-dark); }
 .panel .eyebrow { color: var(--on-dark-muted); }
 .panel .eyebrow::before, .panel .eyebrow::after { background: color-mix(in srgb, var(--on-dark) 45%, transparent); }
-.panel .palm { color: #1d0b02; opacity: 0.22; width: 900px; top: -220px; inset-inline-end: -260px; inset-inline-start: auto; filter: blur(7px); }
+.panel .palm { color: #1d0b02; opacity: 0.24; width: 860px; top: -110px; inset-inline-start: -170px; }
 .panel > :not(.palm) { position: relative; z-index: 1; }
 .panel .rule { background: color-mix(in srgb, var(--on-dark) 40%, transparent); }
 .panel a:not(.btn) { color: var(--on-dark); }
@@ -581,8 +595,9 @@ a:hover .frame img, .frame:hover img { transform: scale(1.04); }
   padding: clamp(28px, 4vw, 48px); border-radius: var(--radius);
   background: rgb(251 247 242 / 0.6); border: 1px solid color-mix(in srgb, var(--line) 30%, transparent);
 }
-.visit__art { width: clamp(88px, 12vw, 140px); color: var(--panel-1); }
-@media (max-width: 640px) { .visit { grid-template-columns: 1fr; } .visit__art { width: 76px; } }
+.visit__art { width: clamp(96px, 12vw, 150px); height: auto; color: var(--panel-1); }
+.visit__art-bg { fill: var(--sage-soft, var(--cream-2)); stroke: color-mix(in srgb, var(--line) 55%, transparent); stroke-width: 1; }
+@media (max-width: 640px) { .visit { grid-template-columns: 1fr; } .visit__art { width: 96px; } }
 
 /* ==========================================================================
    Service page
@@ -593,7 +608,7 @@ a:hover .frame img, .frame:hover img { transform: scale(1.04); }
 .crumbs a { text-decoration: none; }
 .crumbs a:hover { color: var(--ink); }
 
-.page-hero { position: relative; overflow: clip; padding-block: clamp(24px, 4vw, 48px) clamp(48px, 7vw, 96px); }
+.page-hero { position: relative; overflow-x: clip; overflow-y: visible; padding-block: clamp(24px, 4vw, 48px) clamp(48px, 7vw, 96px); }
 .page-hero .palm { width: min(900px, 130vw); top: -160px; inset-inline-end: -240px; }
 .page-hero__grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: clamp(32px, 6vw, 96px); align-items: center; margin-top: 28px; }
 .page-hero__media .frame { aspect-ratio: 5 / 4.4; }

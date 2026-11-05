@@ -1,6 +1,7 @@
 ---
 // Services staggered diagonally, as on the printed poster: 9:16 poster beside its title and icon bullets.
-// Informational only (no links); the service pages are reached from the header and footer.
+// The poster and the title link to the service page; the poster link is hidden from keyboard and screen readers
+// so each service is announced once.
 // `exclude` + `strip` reuse it as the "other services" row on service pages.
 import { getServices, serviceUrl } from "../lib/services";
 import { fa, link } from "../lib/site";
@@ -27,10 +28,12 @@ const services = (await getServices()).filter((s) => s.id !== exclude && s.data.
       <article class="svc reveal">
         <div class="svc__media">
           <span class="svc__num" aria-hidden="true">{fa(i + 1)}</span>
-          <Photo name={s.data.photo!} alt={s.data.photoAlt} label={s.data.title} sizes="(max-width: 699px) 40vw, 300px" />
+          <a class="svc__poster" href={link(serviceUrl(s.id))} tabindex="-1" aria-hidden="true">
+            <Photo name={s.data.photo!} alt={s.data.photoAlt} label={s.data.title} sizes="(max-width: 699px) 40vw, 300px" />
+          </a>
         </div>
         <div class="svc__body">
-          <H>{s.data.title}</H>
+          <H><a class="svc__title" href={link(serviceUrl(s.id))}>{s.data.title}<Icon name="arrow" /></a></H>
           <span class="ornament" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M6 0c.6 3.4 2.6 5.4 6 6-3.4.6-5.4 2.6-6 6-.6-3.4-2.6-5.4-6-6 3.4-.6 5.4-2.6 6-6Z" /></svg></span>
           <p class="svc__lead">{s.data.lead}</p>
           <span class="svc__label">{s.data.highlights!.title}</span>
